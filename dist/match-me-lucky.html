@@ -1,0 +1,1767 @@
+<title>Match Me Lucky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<style>
+/* ============ tokens ============ */
+:root{
+  --ground:#FAEBD3;
+  --surface:#FFFFFF;
+  --surface-2:#FDF5E8;
+  --surface-3:#F6E4C6;
+  --line:rgba(140,97,6,.30);
+  --line-2:rgba(140,97,6,.52);
+  --ink:#2A1410;
+  --ink-2:#77563F;
+  --chili:#C21F26;
+  --chili-strong:#A3161C;
+  --on-chili:#FFFFFF;
+  --chili-soft:#FADFDA;
+  --reward:#8C6106;
+  --reward-soft:#FBEFD3;
+  --win:#C21F26;
+  --win-soft:#FADFDA;
+  --bubble-them:#FCF2DF;
+  --shadow-lg:0 22px 48px -26px rgba(120,60,10,.42);
+  --shadow-sm:0 6px 18px -12px rgba(120,60,10,.5);
+  --broth-a:216,180,90;
+  --broth-b:194,31,38;
+  --broth-alpha:.38;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#150A06;
+    --surface:#2E1A12;
+    --surface-2:#3A2318;
+    --surface-3:#482E20;
+    --line:rgba(233,192,90,.28);
+    --line-2:rgba(233,192,90,.5);
+    --ink:#FFF2E2;
+    --ink-2:#C4A489;
+    --chili:#F4635A;
+    --chili-strong:#FF9184;
+    --on-chili:#2A0806;
+    --chili-soft:#4C1A14;
+    --reward:#E9C05A;
+    --reward-soft:#3F2D0E;
+    --win:#F4635A;
+    --win-soft:#4C1A14;
+    --bubble-them:#3C2618;
+    --shadow-lg:0 24px 52px -22px rgba(0,0,0,.85);
+    --shadow-sm:0 6px 20px -12px rgba(0,0,0,.9);
+    --broth-a:233,192,90;
+    --broth-b:200,45,50;
+    --broth-alpha:.6;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#150A06;
+  --surface:#2E1A12;
+  --surface-2:#3A2318;
+  --surface-3:#482E20;
+  --line:rgba(233,192,90,.28);
+  --line-2:rgba(233,192,90,.5);
+  --ink:#FFF2E2;
+  --ink-2:#C4A489;
+  --chili:#F4635A;
+  --chili-strong:#FF9184;
+  --on-chili:#2A0806;
+  --chili-soft:#4C1A14;
+  --reward:#E9C05A;
+  --reward-soft:#3F2D0E;
+  --win:#F4635A;
+  --win-soft:#4C1A14;
+  --bubble-them:#3C2618;
+  --shadow-lg:0 24px 52px -22px rgba(0,0,0,.85);
+  --shadow-sm:0 6px 20px -12px rgba(0,0,0,.9);
+  --broth-a:233,192,90;
+  --broth-b:200,45,50;
+  --broth-alpha:.6;
+}
+
+*{box-sizing:border-box}
+/* author display rules below would otherwise beat the UA [hidden] rule */
+[hidden]{display:none !important}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,sans-serif;
+  font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3{font-family:"Mitr","IBM Plex Sans Thai",system-ui,sans-serif;font-weight:600;line-height:1.24;margin:0;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit}
+:focus-visible{outline:2.5px solid var(--chili);outline-offset:3px;border-radius:6px}
+.mono{font-family:"IBM Plex Mono","SFMono-Regular",monospace;font-variant-numeric:tabular-nums}
+
+#broth{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ============ page shell ============ */
+.wrap{
+  position:relative;z-index:1;
+  max-width:1180px;margin:0 auto;
+  padding:clamp(20px,4vw,52px) clamp(16px,4vw,40px) 44px;
+  display:grid;gap:clamp(28px,4vw,56px);
+  grid-template-columns:minmax(0,1fr) 430px;
+  align-items:start;
+}
+@media (max-width:940px){
+  .wrap{grid-template-columns:minmax(0,1fr);justify-items:center}
+  .rail{max-width:520px;width:100%}
+}
+
+/* ============ left rail ============ */
+.rail{display:flex;flex-direction:column;gap:24px;padding-top:6px}
+.eyebrow{
+  display:flex;align-items:center;gap:10px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--chili-strong);
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line-2)}
+.logo b{
+  display:block;font-family:"Mitr",sans-serif;font-weight:700;
+  font-size:clamp(40px,6.6vw,66px);line-height:.98;letter-spacing:-.02em;
+}
+.logo b i{font-style:normal;color:var(--chili)}
+.logo span{
+  display:block;margin-top:6px;
+  font-family:"Mitr",sans-serif;font-weight:400;
+  font-size:clamp(14px,1.8vw,17px);color:var(--ink-2);
+}
+.lede{max-width:46ch;color:var(--ink-2);font-size:15px}
+.lede b{color:var(--ink);font-weight:600}
+
+.steps{border-top:1px solid var(--line)}
+.step{
+  display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;
+  padding:13px 2px;border-bottom:1px solid var(--line);
+}
+.step .n{font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;color:var(--chili-strong);padding-top:3px}
+.step .t{font-family:"Mitr",sans-serif;font-weight:500;font-size:15px;line-height:1.4}
+.step .d{color:var(--ink-2);font-size:13px;line-height:1.5}
+
+.prizes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:430px){.prizes{grid-template-columns:1fr}}
+.prize{
+  display:flex;flex-direction:column;gap:2px;
+  border:1px solid var(--line);border-radius:16px;padding:14px 16px;
+  background:var(--surface);box-shadow:var(--shadow-sm);
+}
+.prize .cap{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+.prize.win .cap{color:var(--win)}
+.prize.lose .cap{color:var(--reward)}
+.prize .big{font-family:"Mitr",sans-serif;font-weight:600;font-size:21px;line-height:1.25}
+.prize .why{font-size:12.5px;color:var(--ink-2);line-height:1.45;margin-top:3px}
+
+/* ============ phone ============ */
+.phone{
+  width:100%;max-width:430px;
+  display:flex;flex-direction:column;
+  min-height:672px;
+  background:var(--surface);
+  border:1px solid var(--line-2);
+  border-radius:34px;overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  position:sticky;top:24px;
+}
+@media (max-width:940px){.phone{position:static}}
+
+.topbar{
+  display:flex;align-items:center;gap:10px;
+  min-height:58px;padding:10px 14px;
+  background:var(--surface-2);border-bottom:1px solid var(--line);
+}
+.iconbtn{
+  width:32px;height:32px;flex:none;border-radius:50%;
+  border:1px solid var(--line-2);display:grid;place-items:center;
+  font-size:15px;transition:background .15s;
+}
+.iconbtn:hover{background:var(--chili-soft)}
+.iconbtn[hidden]{display:none}
+.tbtitle{flex:1;min-width:0}
+.tbtitle .k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.tbtitle .v{font-family:"Mitr",sans-serif;font-weight:500;font-size:14.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.luck{display:flex;align-items:center;gap:6px;flex:none}
+.luck .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;color:var(--ink-2);letter-spacing:.06em}
+.luck .bar{width:40px;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.luck .bar i{display:block;height:100%;width:12%;background:linear-gradient(90deg,var(--reward),var(--chili));transition:width .55s cubic-bezier(.3,.8,.3,1)}
+.langbtn{
+  flex:none;border:1px solid var(--line-2);border-radius:99px;
+  padding:4px 9px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;
+  letter-spacing:.08em;transition:background .15s;
+}
+.langbtn:hover{background:var(--chili-soft)}
+
+.stage{flex:1;min-height:0;position:relative}
+.screen{display:none;flex-direction:column;gap:15px;height:100%;padding:20px 18px 22px}
+.screen.on{display:flex;animation:rise .36s cubic-bezier(.2,.8,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.h-lg{font-size:25px}
+.h-md{font-size:19px}
+.muted{color:var(--ink-2);font-size:13.5px;line-height:1.55}
+.tiny{font-size:12px;color:var(--ink-2);line-height:1.5}
+.center{text-align:center}
+.grow{flex:1;min-height:0}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px}
+.scrolly{overflow-y:auto;overscroll-behavior:contain;padding-right:4px;margin-right:-4px}
+
+/* ============ buttons ============ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:99px;padding:13px 20px;
+  font-family:"Mitr",sans-serif;font-weight:500;font-size:15px;text-align:center;
+  transition:transform .12s,filter .15s,background .15s,border-color .15s;
+}
+.btn:active{transform:scale(.975)}
+.btn.primary{background:var(--chili);color:var(--on-chili)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.reward{background:var(--reward);color:var(--surface)}
+.btn.reward:hover{filter:brightness(1.08)}
+.btn.ghost{border:1px solid var(--line-2)}
+.btn.ghost:hover{background:var(--surface-2);border-color:var(--chili)}
+.btn.wide{width:100%}
+.btn.sm{padding:9px 15px;font-size:13.5px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+
+/* ============ home ============ */
+.gcard{
+  position:relative;width:100%;text-align:left;overflow:hidden;
+  display:flex;flex-direction:column;gap:4px;
+  border:1.5px solid var(--line);border-radius:24px;padding:18px;
+  background:var(--surface-2);
+  transition:transform .18s,border-color .18s,background .18s;
+}
+.gcard:hover{transform:translateY(-3px);border-color:var(--chili);background:var(--surface)}
+.gcard .ico{font-size:29px;line-height:1.1}
+.gcard .en{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--chili-strong)}
+.gcard .nm{font-family:"Mitr",sans-serif;font-weight:600;font-size:20px;line-height:1.25}
+.gcard .ds{font-size:13px;color:var(--ink-2);line-height:1.5}
+.gcard .pill{
+  position:absolute;top:16px;right:16px;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;
+  border:1px solid var(--line-2);border-radius:99px;padding:3px 9px;color:var(--ink-2);
+}
+
+/* ============ form ============ */
+.field{display:flex;flex-direction:column;gap:6px}
+.lab{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.inp,.ta{
+  width:100%;padding:11px 13px;
+  border:1.5px solid var(--line);border-radius:11px;
+  background:var(--surface-2);color:var(--ink);
+  font-size:14.5px;transition:border-color .15s;
+}
+.ta{min-height:76px;resize:vertical;line-height:1.55}
+.inp:focus,.ta:focus{outline:none;border-color:var(--chili)}
+.inp::placeholder,.ta::placeholder{color:var(--ink-2);opacity:.7}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  border:1.5px solid var(--line);border-radius:99px;padding:6px 12px;
+  font-size:13px;background:var(--surface-2);color:var(--ink);transition:.15s;
+}
+.chip:hover{border-color:var(--line-2)}
+.chip[aria-pressed="true"]{border-color:var(--chili);background:var(--chili);color:var(--on-chili);font-weight:600}
+.avs{display:flex;flex-wrap:wrap;gap:7px}
+.av{
+  width:42px;height:42px;border-radius:50%;font-size:21px;
+  display:grid;place-items:center;
+  border:1.5px solid var(--line);background:var(--surface-2);
+  transition:transform .15s,border-color .15s,background .15s;
+}
+.av:hover{transform:scale(1.08)}
+.av[aria-pressed="true"]{border-color:var(--chili);background:var(--chili-soft);transform:scale(1.08)}
+
+/* ============ duo deck ============ */
+.deck{position:relative;flex:1;min-height:0}
+.card{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  border:1.5px solid var(--line);border-radius:24px;
+  background:var(--surface-2);box-shadow:var(--shadow-sm);
+  overflow:hidden;touch-action:none;user-select:none;
+  will-change:transform;
+}
+.card .face{
+  flex:none;height:42%;min-height:130px;display:grid;place-items:center;
+  font-size:62px;
+  background:radial-gradient(120% 100% at 50% 0%,var(--chili-soft),var(--surface-3));
+  border-bottom:1px solid var(--line);
+}
+.card .meat{padding:14px 16px 16px;display:flex;flex-direction:column;gap:7px;overflow-y:auto}
+.card .who{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card .who b{font-family:"Mitr",sans-serif;font-weight:600;font-size:20px}
+.card .who span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2)}
+.card .job{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--chili-strong)}
+.card .bio{font-size:13.5px;line-height:1.6}
+.card .tg{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.card .tg em{
+  font-style:normal;font-size:11.5px;padding:3px 9px;border-radius:99px;
+  background:var(--surface-3);color:var(--ink-2);
+}
+.stamp{
+  position:absolute;top:20px;font-family:"Mitr",sans-serif;font-weight:700;font-size:26px;
+  padding:5px 14px;border-radius:10px;border:3px solid currentColor;
+  opacity:0;transition:opacity .12s;pointer-events:none;
+}
+.stamp.like{left:18px;color:var(--win);transform:rotate(-13deg)}
+.stamp.pass{right:18px;color:var(--ink-2);transform:rotate(13deg)}
+.deckbtns{display:flex;justify-content:center;gap:16px;flex:none}
+.big-round{
+  width:60px;height:60px;border-radius:50%;font-size:24px;
+  display:grid;place-items:center;border:1.5px solid var(--line-2);
+  background:var(--surface);box-shadow:var(--shadow-sm);
+  transition:transform .14s,background .15s,border-color .15s;
+}
+.big-round:hover{transform:scale(1.08)}
+.big-round.no:hover{border-color:var(--chili);background:var(--chili-soft)}
+.big-round.yes{border-color:var(--chili);background:var(--chili);color:var(--on-chili)}
+.big-round.yes:hover{filter:brightness(1.1)}
+.deck-empty{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  padding:24px;color:var(--ink-2);font-size:14px;
+}
+
+/* ============ chat ============ */
+.roombar{
+  display:flex;align-items:center;gap:10px;flex:none;
+  border:1px solid var(--line);border-radius:16px;
+  padding:10px 12px;background:var(--surface-2);
+}
+.seats{display:flex}
+.seat{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:17px;
+  background:var(--surface-3);border:2px solid var(--surface-2);margin-left:-8px;
+  transition:opacity .3s;
+}
+.seat:first-child{margin-left:0}
+.seat.me{border-color:var(--chili)}
+.roombar .rmeta{flex:1;min-width:0}
+.roombar .rmeta b{display:block;font-family:"Mitr",sans-serif;font-weight:500;font-size:14px;line-height:1.3}
+.roombar .rmeta span{font-size:11.5px;color:var(--ink-2)}
+.clock{
+  font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;
+  padding:5px 10px;border-radius:10px;background:var(--surface-3);flex:none;
+}
+.clock.urgent{background:var(--chili);color:var(--on-chili)}
+
+.thread{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:2px 2px 4px}
+.msg{display:flex;gap:8px;max-width:88%;animation:pop .3s cubic-bezier(.2,.8,.3,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.msg .ava{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:15px;background:var(--surface-3)}
+.msg .body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.msg .nm{font-size:10.5px;font-weight:600;color:var(--ink-2);padding-left:2px}
+.msg .bub{
+  padding:8px 12px;border-radius:16px 16px 16px 5px;
+  background:var(--bubble-them);font-size:13.5px;line-height:1.55;
+  word-wrap:break-word;
+}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .bub{background:var(--chili);color:var(--on-chili);border-radius:16px 16px 5px 16px}
+.msg.sys{align-self:center;max-width:100%}
+.msg.sys .bub{
+  background:transparent;border:1px dashed var(--line-2);color:var(--ink-2);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;text-align:center;border-radius:99px;padding:4px 12px;
+}
+.typing .bub{display:flex;gap:4px;align-items:center;padding:11px 13px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ink-2);opacity:.5;animation:blip 1.1s infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blip{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:.9;transform:translateY(-3px)}}
+
+.composer{display:flex;gap:8px;flex:none;align-items:center}
+.composer .inp{border-radius:99px}
+.send{
+  width:42px;height:42px;flex:none;border-radius:50%;
+  background:var(--chili);color:var(--on-chili);display:grid;place-items:center;font-size:16px;
+  transition:filter .15s,transform .12s;
+}
+.send:hover{filter:brightness(1.1)}
+.send:active{transform:scale(.94)}
+
+/* ============ confirm ============ */
+.votes{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.vote{display:flex;flex-direction:column;align-items:center;gap:6px;width:66px}
+.vote .face{
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:25px;
+  background:var(--surface-3);border:2px solid var(--line);transition:border-color .3s,background .3s;
+}
+.vote.yes .face{border-color:var(--win);background:var(--win-soft)}
+.vote.no .face{border-color:var(--chili);background:var(--chili-soft);opacity:.55}
+.vote .nm{font-size:11.5px;text-align:center;line-height:1.3;color:var(--ink-2)}
+.vote .st{font-size:15px;height:20px}
+
+/* ============ result + ticket ============ */
+.verdict{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none}
+.verdict .mark{font-size:52px;line-height:1;animation:thump .55s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes thump{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
+.verdict .en{
+  font-family:"Mitr",sans-serif;font-weight:700;font-size:30px;letter-spacing:-.01em;
+}
+.verdict.win .en{color:var(--win)}
+.verdict.lose .en{color:var(--ink-2)}
+.verdict .th{font-size:14px;color:var(--ink-2);text-align:center;max-width:30ch}
+
+.ticket{
+  position:relative;flex:none;
+  border:1.5px solid var(--line-2);border-radius:18px;
+  background:var(--surface-2);overflow:hidden;
+}
+.ticket::before,.ticket::after{
+  content:"";position:absolute;width:20px;height:20px;border-radius:50%;
+  background:var(--surface);border:1.5px solid var(--line-2);
+  top:var(--notch,58%);
+}
+.ticket::before{left:-11px;clip-path:inset(0 0 0 50%)}
+.ticket::after{right:-11px;clip-path:inset(0 50% 0 0)}
+.ticket .top{padding:14px 16px;display:flex;flex-direction:column;gap:7px}
+.ticket .kv{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.ticket .kv span{color:var(--ink-2)}
+.ticket .kv b{font-weight:600;text-align:right}
+.ticket .hd{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--chili-strong);
+}
+.ticket .ttl{font-family:"Mitr",sans-serif;font-weight:600;font-size:18px;line-height:1.3}
+.ticket .perf{border-top:1.5px dashed var(--line-2)}
+.ticket .bot{padding:13px 16px 15px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.ticket .code{
+  font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;letter-spacing:.1em;
+  padding:7px 14px;border-radius:9px;background:var(--surface-3);
+}
+.ticket .barcode{
+  width:100%;height:26px;border-radius:4px;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 5px,transparent 5px 9px,var(--ink) 9px 12px,transparent 12px 14px);
+  opacity:.72;
+}
+.voucher{
+  flex:none;display:flex;align-items:center;gap:12px;
+  border:1.5px solid var(--reward);border-radius:16px;
+  padding:13px 15px;background:var(--reward-soft);
+}
+.voucher .amt{font-family:"Mitr",sans-serif;font-weight:700;font-size:26px;color:var(--reward);line-height:1;flex:none}
+.voucher .txt b{display:block;font-family:"Mitr",sans-serif;font-weight:500;font-size:14px;line-height:1.35}
+.voucher .txt span{font-size:11.5px;color:var(--ink-2);line-height:1.45;display:block}
+
+.footnote{
+  flex:none;font-family:"IBM Plex Mono",monospace;font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);text-align:center;
+}
+
+/* ============ match burst overlay ============ */
+.burst{
+  position:absolute;inset:0;z-index:5;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:var(--surface);padding:24px;text-align:center;
+}
+.burst.on{display:flex;animation:rise .3s ease both}
+.burst .hearts{font-size:46px;animation:thump .6s cubic-bezier(.3,1.5,.5,1) both}
+.burst .t{font-family:"Mitr",sans-serif;font-weight:700;font-size:28px;color:var(--chili)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+
+/* ============ duo: face icon + profile sheet ============ */
+.facebtn{
+  position:relative;flex:none;
+  width:46px;height:46px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--surface-3);
+  border:2px solid var(--chili);
+  box-shadow:var(--shadow-sm);
+  transition:transform .16s,box-shadow .16s;
+}
+.facebtn:hover{transform:scale(1.07)}
+.facebtn:active{transform:scale(.97)}
+.fb-av{font-size:24px;line-height:1}
+.fb-i{
+  position:absolute;right:-3px;bottom:-3px;
+  width:18px;height:18px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--chili);color:var(--on-chili);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+  border:2px solid var(--surface-2);
+}
+
+.sheet{
+  position:absolute;inset:0;z-index:8;
+  display:flex;align-items:center;justify-content:center;padding:22px 18px;
+  background:color-mix(in srgb,var(--ink) 46%,transparent);
+  animation:fade .2s ease both;
+}
+@supports not (background:color-mix(in srgb,red 50%,transparent)){
+  .sheet{background:rgba(0,0,0,.5)}
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet-card{
+  position:relative;width:100%;max-width:330px;max-height:100%;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  padding:26px 20px 18px;
+  background:var(--surface);
+  border:1.5px solid var(--line-2);border-radius:24px;
+  box-shadow:var(--shadow-lg);
+  animation:sheetIn .28s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes sheetIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+.sheet-x{
+  position:absolute;top:10px;right:10px;
+  width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;font-size:14px;
+  border:1px solid var(--line-2);
+  transition:background .15s;
+}
+.sheet-x:hover{background:var(--chili-soft)}
+.sheet-face{
+  width:96px;height:96px;border-radius:50%;
+  display:grid;place-items:center;font-size:50px;
+  background:radial-gradient(120% 100% at 50% 0%,var(--chili-soft),var(--surface-3));
+  border:2px solid var(--chili);
+}
+.sheet-who{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.sheet-who b{font-family:"Mitr",sans-serif;font-weight:600;font-size:21px}
+.sheet-who span{font-size:14px;color:var(--ink-2)}
+.sheet-job{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--chili-strong);
+}
+.sheet-bio{font-size:13.5px;line-height:1.6;text-align:center;color:var(--ink)}
+.sheet-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.sheet-tags em{
+  font-style:normal;font-size:11.5px;padding:3px 10px;border-radius:99px;
+  background:var(--surface-3);color:var(--ink-2);
+}
+.sheet-actions{display:flex;gap:9px;width:100%;margin-top:10px}
+
+/* ============ swipe card: avatar as a real icon ============ */
+.card .face-ring{
+  width:104px;height:104px;border-radius:50%;
+  display:grid;place-items:center;font-size:52px;line-height:1;
+  background:var(--surface);
+  border:2.5px solid var(--chili);
+  box-shadow:var(--shadow-sm);
+}
+.gchip{
+  font-style:normal;font-size:11px;font-weight:600;
+  padding:2px 9px;border-radius:99px;
+  background:var(--chili-soft);color:var(--chili-strong);
+  white-space:nowrap;
+}
+</style>
+
+<canvas id="broth" aria-hidden="true"></canvas>
+
+<div class="wrap">
+
+  <!-- ================= left rail ================= -->
+  <div class="rail">
+    <div class="eyebrow" data-i18n="eyebrow">Lucky Suki × Campaign</div>
+
+    <div class="logo">
+      <b>Match me <i>Lucky</i></b>
+      <span data-i18n="tagline">จับคู่ให้ดวงพาไป แล้วมาเจอกันที่หม้อเดียวกัน</span>
+    </div>
+
+    <p class="lede" data-i18n-html="lede"></p>
+
+    <div class="steps">
+      <div class="step"><div class="n">01</div><div><div class="t" data-i18n="s1t">เลือกกลุ่มของคุณ</div><div class="d" data-i18n="s1d">Lucky Duo หาคู่เดต หรือ Lucky Gang หาเพื่อนใหม่แบบ 4 คน</div></div></div>
+      <div class="step"><div class="n">02</div><div><div class="t" data-i18n="s2t">เขียนข้อมูลที่อยากให้เขารู้</div><div class="d" data-i18n="s2d">ไบโอ ความสนใจ และน้ำซุปที่คุณเลือกเสมอ</div></div></div>
+      <div class="step"><div class="n">03</div><div><div class="t" data-i18n="s3t">แมชในระบบออนไลน์</div><div class="d" data-i18n="s3d">ปัดโปรไฟล์ หรือเข้าห้องอัตโนมัติ แล้วกดยืนยันตอนจบ</div></div></div>
+      <div class="step"><div class="n">04</div><div><div class="t" data-i18n="s4t">เจอกันจริงที่ Lucky Suki</div><div class="d" data-i18n="s4d">ทุกคนได้ voucher กลับบ้าน ไม่ว่าผลจะออกทางไหน</div></div></div>
+    </div>
+
+    <div class="prizes">
+      <div class="prize win">
+        <div class="cap">Matched 💓✅</div>
+        <div class="big" data-i18n="pwb">ส่วนลด 10%</div>
+        <div class="why" data-i18n="pww">First Visit ที่ร้าน แล้วรับ voucher ไว้ใช้ครั้งถัดไป</div>
+      </div>
+      <div class="prize lose">
+        <div class="cap">No match ❎</div>
+        <div class="big" data-i18n="plb">Lucky Dessert ฿100</div>
+        <div class="why" data-i18n="plw">ดวงยังไม่มา แต่ของหวานมาแล้ว แลกได้ที่ร้านวันนี้</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= phone ================= -->
+  <div class="phone">
+    <div class="topbar">
+      <button class="iconbtn" id="back" hidden aria-label="Back">←</button>
+      <div class="tbtitle">
+        <div class="k" id="tbk">Match me Lucky</div>
+        <div class="v" id="tbv" data-i18n="tb_home">เลือกกลุ่มที่ใช่ของคุณ</div>
+      </div>
+      <div class="luck" title="Luck">
+        <span class="lbl">LUCK</span>
+        <span class="bar"><i id="luckbar"></i></span>
+      </div>
+      <button class="langbtn" id="lang">EN</button>
+    </div>
+
+    <div class="stage">
+
+      <!-- ---- home ---- -->
+      <section class="screen on" id="sc-home">
+        <div>
+          <h2 class="h-lg" data-i18n="home_h">วันนี้ดวงพาคุณไปทางไหน</h2>
+          <p class="muted" data-i18n="home_p">เลือกหนึ่งกลุ่ม แล้วปล่อยให้ระบบจับคู่ทำงาน</p>
+        </div>
+        <div class="stack grow">
+          <button class="gcard" data-group="duo">
+            <span class="pill" data-i18n="p2">2 คน</span>
+            <span class="ico">💘</span>
+            <span class="en">Lucky Duo</span>
+            <span class="nm" data-i18n="duo_nm">หาคู่เดตของคุณ</span>
+            <span class="ds" data-i18n="duo_ds">ปัดโปรไฟล์ทีละคน ถูกใจตรงกันเมื่อไหร่ก็เริ่มคุยได้เลย</span>
+          </button>
+          <button class="gcard" data-group="gang">
+            <span class="pill" data-i18n="p4">4 คน</span>
+            <span class="ico">🍲</span>
+            <span class="en">Lucky Gang</span>
+            <span class="nm" data-i18n="gang_nm">หาเพื่อนใหม่</span>
+            <span class="ds" data-i18n="gang_ds">ระบบสุ่มห้อง 4 คนให้อัตโนมัติ ไม่ถูกใจก็กดออกเพื่อสุ่มใหม่ได้เรื่อยๆ</span>
+          </button>
+        </div>
+        <p class="tiny center" data-i18n="home_f">ทุกการเล่นได้ voucher กลับบ้านเสมอ</p>
+      </section>
+
+      <!-- ---- bio ---- -->
+      <section class="screen" id="sc-bio">
+        <div>
+          <h2 class="h-md" data-i18n="bio_h">ข้อมูลเราที่อยากให้เขารู้</h2>
+          <p class="muted" data-i18n="bio_p">ยิ่งเป็นตัวเอง ยิ่งเจอคนที่ใช่</p>
+        </div>
+        <div class="stack grow scrolly">
+          <div class="row">
+            <div class="field" style="flex:2">
+              <label class="lab" for="f-name" data-i18n="l_name">ชื่อเล่น</label>
+              <input class="inp" id="f-name" maxlength="18" data-i18n-ph="ph_name" placeholder="เรียกเราว่า…">
+            </div>
+            <div class="field" style="flex:1">
+              <label class="lab" for="f-age" data-i18n="l_age">อายุ</label>
+              <input class="inp" id="f-age" type="number" min="18" max="80" placeholder="24">
+            </div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_av">รูปแทนตัว</span>
+            <div class="avs" id="f-av"></div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_gender">เพศของเรา</span>
+            <div class="chips" id="f-gender"></div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_pref">อยากเดทกับ</span>
+            <div class="chips" id="f-pref"></div>
+            <span class="tiny" id="pref-count"></span>
+          </div>
+          <div class="field">
+            <label class="lab" for="f-bio" data-i18n="l_bio">แนะนำตัวสั้นๆ</label>
+            <textarea class="ta" id="f-bio" maxlength="140" data-i18n-ph="ph_bio" placeholder="เล่าอะไรก็ได้ที่ทำให้เราน่าคุยด้วย"></textarea>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_tags">ความสนใจ</span>
+            <div class="chips" id="f-tags"></div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_broth">น้ำซุปประจำตัว</span>
+            <div class="chips" id="f-broth"></div>
+          </div>
+        </div>
+        <button class="btn primary wide" id="bio-go" data-i18n="bio_go">เริ่มหาคู่แมช</button>
+      </section>
+
+      <!-- ---- duo deck ---- -->
+      <section class="screen" id="sc-duo">
+        <div class="deck" id="deck">
+          <p class="deck-empty" id="deck-empty" data-i18n="deck_empty">โปรไฟล์วันนี้หมดแล้ว พรุ่งนี้ดวงใหม่มาอีกรอบ</p>
+        </div>
+        <div class="deckbtns">
+          <button class="big-round no" id="d-pass" aria-label="Pass">✕</button>
+          <button class="big-round yes" id="d-like" aria-label="Like">💓</button>
+        </div>
+        <p class="tiny center" data-i18n="deck_hint">ลากการ์ดซ้ายขวา หรือกดปุ่มก็ได้</p>
+        <div class="burst" id="burst">
+          <div class="hearts">💘</div>
+          <div class="t">It's a match!</div>
+          <p class="muted" id="burst-sub"></p>
+        </div>
+      </section>
+
+      <!-- ---- chat (shared by duo + gang) ---- -->
+      <section class="screen" id="sc-chat">
+        <div class="roombar">
+          <button class="facebtn" id="facebtn" hidden aria-haspopup="dialog">
+            <span class="fb-av" id="fb-av">🙂</span>
+            <span class="fb-i">i</span>
+          </button>
+          <div class="seats" id="seats"></div>
+          <div class="rmeta">
+            <b id="room-name">—</b>
+            <span id="room-sub">—</span>
+          </div>
+          <div class="clock" id="clock" hidden>0:24</div>
+        </div>
+        <div class="thread" id="thread"></div>
+        <form class="composer" id="composer">
+          <input class="inp" id="msg" autocomplete="off" data-i18n-ph="ph_msg" placeholder="พิมพ์อะไรสักอย่าง…">
+          <button class="send" type="submit" aria-label="Send">➤</button>
+        </form>
+        <div class="row">
+          <button class="btn ghost sm" id="leave" style="flex:1" data-i18n="leave">ออกจากห้อง → สุ่มใหม่</button>
+          <button class="btn primary sm" id="tovote" style="flex:1" data-i18n="tovote">ข้ามไปโหวตเลย</button>
+          <button class="btn ghost sm" id="duo-no" style="flex:1" data-i18n="duo_no">ไม่แมช</button>
+          <button class="btn primary sm" id="duo-yes" style="flex:1" data-i18n="duo_yes">ขอแมช 💓</button>
+        </div>
+
+        <!-- profile sheet: the face icon opens this, and you decide from here -->
+        <div class="sheet" id="sheet" hidden>
+          <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sh-name">
+            <button class="sheet-x" id="sheet-x" aria-label="Close">✕</button>
+            <div class="sheet-face" id="sh-face">🙂</div>
+            <div class="sheet-who"><b id="sh-name">—</b><span class="mono" id="sh-age"></span></div>
+            <div class="sheet-job" id="sh-job"></div>
+            <p class="sheet-bio" id="sh-bio"></p>
+            <div class="sheet-tags" id="sh-tags"></div>
+            <div class="sheet-actions">
+              <button class="btn ghost sm" id="sh-no" style="flex:1" data-i18n="duo_no">ไม่แมช</button>
+              <button class="btn primary sm" id="sh-yes" style="flex:1" data-i18n="duo_yes">ขอแมช 💓</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- confirm ---- -->
+      <section class="screen" id="sc-confirm">
+        <div class="center">
+          <h2 class="h-md" data-i18n="cf_h">ยืนยันแมชไหม</h2>
+          <p class="muted" id="cf-p"></p>
+        </div>
+        <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:18px">
+          <div class="votes" id="votes"></div>
+          <p class="tiny center" id="cf-status" data-i18n="cf_wait">กดยืนยันแล้วรอผลจากอีกฝ่าย</p>
+        </div>
+        <div class="stack">
+          <button class="btn primary wide" id="cf-yes" data-i18n="cf_yes">ยืนยันแมช 💓</button>
+          <button class="btn ghost wide sm" id="cf-no" data-i18n="cf_no">ยังก่อน กลับไปคุยต่อ</button>
+        </div>
+      </section>
+
+      <!-- ---- matched ---- -->
+      <section class="screen" id="sc-win">
+        <div class="verdict win">
+          <div class="mark">💓✅</div>
+          <div class="en">Matched</div>
+          <p class="th" id="win-sub"></p>
+        </div>
+        <div class="grow scrolly stack">
+          <div class="ticket">
+            <div class="top">
+              <div class="hd">First Visit</div>
+              <div class="ttl">Lucky Suki</div>
+              <div class="kv"><span data-i18n="t_when">วันเวลา</span><b id="w-when">—</b></div>
+              <div class="kv"><span data-i18n="t_table">โต๊ะ</span><b id="w-table">—</b></div>
+              <div class="kv"><span data-i18n="t_who">มากันกี่คน</span><b id="w-who">—</b></div>
+            </div>
+            <div class="perf"></div>
+            <div class="bot">
+              <div class="code" id="w-code">—</div>
+              <div class="barcode"></div>
+              <div class="tiny" data-i18n="t_show">แสดงโค้ดนี้ที่หน้าร้านเพื่อรับโต๊ะ</div>
+            </div>
+          </div>
+          <div class="voucher">
+            <div class="amt">10%</div>
+            <div class="txt">
+              <b data-i18n="v_win">ส่วนลดครั้งถัดไป</b>
+              <span data-i18n="v_win_s">ใช้ได้หลังจบมื้อแรก ภายใน 60 วัน</span>
+              <span class="mono" id="w-vcode" style="color:var(--reward);font-weight:600;margin-top:2px">—</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn ghost wide sm" data-restart data-i18n="again">เล่นอีกครั้ง</button>
+      </section>
+
+      <!-- ---- no match ---- -->
+      <section class="screen" id="sc-lose">
+        <div class="verdict lose">
+          <div class="mark">❎</div>
+          <div class="en">No match</div>
+          <p class="th">your luck needs a little more time…</p>
+        </div>
+        <div class="grow scrolly stack">
+          <p class="center" style="font-family:Mitr,sans-serif;font-size:16px;line-height:1.5">Today, you’ve unlocked a<br><b style="color:var(--reward)">Lucky Dessert!</b> 🍮</p>
+          <div class="ticket" style="--notch:56%">
+            <div class="top">
+              <div class="hd">Lucky Dessert</div>
+              <div class="ttl" data-i18n="l_ttl">ของหวานประจำวันของคุณ</div>
+              <div class="kv"><span data-i18n="t_val">มูลค่า</span><b>฿100</b></div>
+              <div class="kv"><span data-i18n="t_use">ใช้ได้</span><b data-i18n="t_today">วันนี้ ที่ Lucky Suki</b></div>
+            </div>
+            <div class="perf"></div>
+            <div class="bot">
+              <div class="code" id="l-code">—</div>
+              <div class="barcode"></div>
+              <div class="tiny" data-i18n="t_show2">ยื่นโค้ดนี้ที่เคาน์เตอร์ของหวาน</div>
+            </div>
+          </div>
+          <div class="voucher">
+            <div class="amt">฿100</div>
+            <div class="txt">
+              <b data-i18n="v_lose">Lucky Dessert Voucher</b>
+              <span data-i18n="v_lose_s">ดวงยังไม่มา แต่ยังมีโต๊ะรอคุณอยู่</span>
+            </div>
+          </div>
+        </div>
+        <div class="stack">
+          <button class="btn primary wide" data-restart data-i18n="retry">ลองแมชใหม่อีกรอบ</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- js/store.js ---------- */
+"use strict";
+
+/* ==================== storage (always guarded) ==================== */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+};
+
+/* ---------- js/i18n.js ---------- */
+"use strict";
+
+/* ==================== i18n ==================== */
+const I18N = {
+th:{
+  eyebrow:"Lucky Suki × แคมเปญ", tagline:"จับคู่ให้ดวงพาไป แล้วมาเจอกันที่หม้อเดียวกัน",
+  lede:"<b>Match me Lucky</b> คือระบบจับคู่ออนไลน์ของร้าน Lucky Suki แมชสำเร็จก็ได้เหตุผลที่จะมาเจอกันจริง แมชไม่สำเร็จก็ยังได้ของหวานกลับบ้าน — ไม่มีใครออกจากเกมมือเปล่า",
+  s1t:"เลือกกลุ่มของคุณ", s1d:"Lucky Duo หาคู่เดต หรือ Lucky Gang หาเพื่อนใหม่แบบ 4 คน",
+  s2t:"เขียนข้อมูลที่อยากให้เขารู้", s2d:"ไบโอ ความสนใจ และน้ำซุปที่คุณเลือกเสมอ",
+  s3t:"แมชในระบบออนไลน์", s3d:"ปัดโปรไฟล์ หรือเข้าห้องอัตโนมัติ แล้วกดยืนยันตอนจบ",
+  s4t:"เจอกันจริงที่ Lucky Suki", s4d:"ทุกคนได้ voucher กลับบ้าน ไม่ว่าผลจะออกทางไหน",
+  pwb:"ส่วนลด 10%", pww:"First Visit ที่ร้าน แล้วรับ voucher ไว้ใช้ครั้งถัดไป",
+  plb:"Lucky Dessert ฿100", plw:"ดวงยังไม่มา แต่ของหวานมาแล้ว แลกได้ที่ร้านวันนี้",
+  tb_home:"เลือกกลุ่มที่ใช่ของคุณ", tb_bio:"โปรไฟล์ของคุณ", tb_duo:"ปัดหาคนที่ใช่",
+  tb_chat:"ห้องแชท", tb_confirm:"ตอนจบแล้ว", tb_win:"แมชสำเร็จ", tb_lose:"ยังไม่แมช",
+  home_h:"วันนี้ดวงพาคุณไปทางไหน", home_p:"เลือกหนึ่งกลุ่ม แล้วปล่อยให้ระบบจับคู่ทำงาน",
+  p2:"2 คน", p4:"4 คน",
+  duo_nm:"หาคู่เดตของคุณ", duo_ds:"ปัดโปรไฟล์ทีละคน ถูกใจตรงกันเมื่อไหร่ก็เริ่มคุยได้เลย",
+  gang_nm:"หาเพื่อนใหม่", gang_ds:"ระบบสุ่มห้อง 4 คนให้อัตโนมัติ ไม่ถูกใจก็กดออกเพื่อสุ่มใหม่ได้เรื่อยๆ",
+  home_f:"ทุกการเล่นได้ voucher กลับบ้านเสมอ",
+  bio_h:"ข้อมูลเราที่อยากให้เขารู้", bio_p:"ยิ่งเป็นตัวเอง ยิ่งเจอคนที่ใช่",
+  l_name:"ชื่อเล่น", l_age:"อายุ", l_av:"รูปแทนตัว", l_bio:"แนะนำตัวสั้นๆ",
+  l_tags:"ความสนใจ", l_broth:"น้ำซุปประจำตัว",
+  l_gender:"เพศของเรา", l_pref:"อยากเดทกับ",
+  pref_count:"มี {n} คนให้ปัดในโหมด Lucky Duo", pref_none:"ยังไม่มีใครตรงเงื่อนไขนี้ ลองเลือกทุกเพศดู",
+  ph_name:"เรียกเราว่า…", ph_bio:"เล่าอะไรก็ได้ที่ทำให้เราน่าคุยด้วย", ph_msg:"พิมพ์อะไรสักอย่าง…",
+  bio_go:"เริ่มหาคู่แมช", need_name:"ใส่ชื่อเล่นก่อนนะ",
+  deck_empty:"โปรไฟล์วันนี้หมดแล้ว พรุ่งนี้ดวงใหม่มาอีกรอบ", deck_hint:"ลากการ์ดซ้ายขวา หรือกดปุ่มก็ได้",
+  leave:"ออกจากห้อง → สุ่มใหม่", tovote:"ข้ามไปโหวตเลย",
+  invite:"ชวนไปกินสุกี้ 💓", stay:"อยู่ต่อจนจบ",
+  duo_yes:"ขอแมช 💓", duo_no:"ไม่แมช",
+  sys_passed:"คุณเลือกไม่แมชกับ {n} · กำลังหาคนใหม่ให้…",
+  sys_tapface:"แตะรูปหน้าเพื่อดูโปรไฟล์เต็ม แล้วเลือกว่าจะแมชไหม",
+  cf_h:"ยืนยันแมชไหม", cf_yes:"ยืนยันแมช 💓", cf_no:"ยังก่อน กลับไปคุยต่อ",
+  cf_wait:"กดยืนยันแล้วรอผลจากอีกฝ่าย", cf_counting:"กำลังรอผลโหวต…",
+  cf_duo:"ถ้าทั้งคู่กดยืนยัน ระบบจะจองโต๊ะแรกให้ทันที",
+  cf_gang:"ได้ 3-4 เสียงคือแมชเลย · ได้แค่ 2 เสียงจะสุ่มห้องใหม่ให้ทันที",
+  cf_near:"ได้ {n} เสียง ยังไม่ถึง 3 · กำลังพาไปห้องใหม่…",
+  again:"เล่นอีกครั้ง", retry:"ลองแมชใหม่อีกรอบ",
+  t_when:"วันเวลา", t_table:"โต๊ะ", t_who:"มากันกี่คน", t_show:"แสดงโค้ดนี้ที่หน้าร้านเพื่อรับโต๊ะ",
+  t_val:"มูลค่า", t_use:"ใช้ได้", t_today:"วันนี้ ที่ Lucky Suki", t_show2:"ยื่นโค้ดนี้ที่เคาน์เตอร์ของหวาน",
+  v_win:"ส่วนลดครั้งถัดไป", v_win_s:"ใช้ได้หลังจบมื้อแรก ภายใน 60 วัน",
+  v_lose:"Lucky Dessert Voucher", v_lose_s:"ดวงยังไม่มา แต่ยังมีโต๊ะรอคุณอยู่",
+  l_ttl:"ของหวานประจำวันของคุณ",
+  when_val:"ศุกร์นี้ · 19:30",
+  win_duo:"คุณกับ {n} ถูกใจตรงกัน โต๊ะแรกถูกจองให้แล้ว",
+  win_gang:"แก๊งนี้ไปต่อ เจอกันที่ Lucky Suki",
+  sys_join:"คุณเข้าห้องแล้ว · อยู่ในห้องจนหมดเวลาเพื่อได้สิทธิ์โหวต",
+  sys_left:"ออกจากห้องเดิม กำลังสุ่มห้องใหม่…",
+  sys_reroll:"สุ่มห้องใหม่ครั้งที่ {n} · ดวงสะสมเพิ่มขึ้น",
+  sys_time:"หมดเวลาคุยแล้ว ถึงเวลายืนยัน",
+  seatN:"{n} คนในห้อง", tonight:"คืนนี้",
+  people:"{n} คน",
+  burst_sub:"เริ่มคุยกับ {n} ได้เลย"
+},
+en:{
+  eyebrow:"Lucky Suki × Campaign", tagline:"Let luck do the matching — meet over one hot pot",
+  lede:"<b>Match me Lucky</b> is Lucky Suki's online matching game. Match, and you get a reason to meet for real. Don't match, and dessert is still on us — nobody leaves empty-handed.",
+  s1t:"Pick your group", s1d:"Lucky Duo for a date, or Lucky Gang for a table of four",
+  s2t:"Write what you want them to know", s2d:"Your bio, your interests, and the broth you always order",
+  s3t:"Match online", s3d:"Swipe profiles or drop into an auto room, then confirm at the end",
+  s4t:"Meet for real at Lucky Suki", s4d:"Everyone walks away with a voucher, either way",
+  pwb:"10% off", pww:"First Visit at the restaurant, plus a voucher for next time",
+  plb:"Lucky Dessert ฿100", plw:"Luck's late, dessert isn't — redeem it in store today",
+  tb_home:"Choose your group", tb_bio:"Your profile", tb_duo:"Swipe to find them",
+  tb_chat:"Chat room", tb_confirm:"Final call", tb_win:"Matched", tb_lose:"No match",
+  home_h:"Where is luck taking you today?", home_p:"Pick one group and let the matcher work",
+  p2:"2 people", p4:"4 people",
+  duo_nm:"Find your date", duo_ds:"Swipe one profile at a time — like each other and the chat opens",
+  gang_nm:"Find new friends", gang_ds:"Auto-dropped into a room of 4. Don't like it? Leave and reroll as often as you want",
+  home_f:"Every play ends with a voucher",
+  bio_h:"What you want them to know", bio_p:"The more you, the better the match",
+  l_name:"Nickname", l_age:"Age", l_av:"Avatar", l_bio:"Short intro",
+  l_tags:"Interests", l_broth:"Your broth",
+  l_gender:"I am", l_pref:"I want to date",
+  pref_count:"{n} people to swipe in Lucky Duo", pref_none:"Nobody matches that yet — try Everyone",
+  ph_name:"Call me…", ph_bio:"Anything that makes you worth talking to", ph_msg:"Say something…",
+  bio_go:"Start matching", need_name:"Add a nickname first",
+  deck_empty:"That's everyone for today. New luck tomorrow.", deck_hint:"Drag the card, or use the buttons",
+  leave:"Leave room → reroll", tovote:"Skip to the vote",
+  invite:"Ask them to suki 💓", stay:"Stay till the end",
+  duo_yes:"Ask to match 💓", duo_no:"Pass",
+  sys_passed:"You passed on {n} · finding someone new…",
+  sys_tapface:"Tap their photo for the full profile, then decide",
+  cf_h:"Confirm the match?", cf_yes:"Confirm match 💓", cf_no:"Not yet, keep chatting",
+  cf_wait:"Confirm, then wait for their answer", cf_counting:"Counting votes…",
+  cf_duo:"If you both confirm, we book your first table right away",
+  cf_gang:"3-4 votes and you are matched · only 2 and we find you a new room",
+  cf_near:"{n} votes, 3 needed · moving you to a new room…",
+  again:"Play again", retry:"Try matching again",
+  t_when:"When", t_table:"Table", t_who:"Party", t_show:"Show this code at the door for your table",
+  t_val:"Value", t_use:"Valid", t_today:"Today, at Lucky Suki", t_show2:"Hand this code to the dessert counter",
+  v_win:"10% off next time", v_win_s:"Valid after your first meal, for 60 days",
+  v_lose:"Lucky Dessert Voucher", v_lose_s:"Luck's late, but a table is still waiting",
+  l_ttl:"Your dessert of the day",
+  when_val:"This Friday · 7:30 PM",
+  win_duo:"You and {n} liked each other. First table is booked.",
+  win_gang:"This gang is on. See you at Lucky Suki.",
+  sys_join:"You joined · stay till the timer ends to earn a vote",
+  sys_left:"Left the room. Finding a new one…",
+  sys_reroll:"Reroll #{n} · your luck went up",
+  sys_time:"Time's up. Final call.",
+  seatN:"{n} in the room", tonight:"tonight",
+  people:"{n} people",
+  burst_sub:"Say hi to {n}"
+}};
+
+let lang = store.get("mml.lang") === "en" ? "en" : "th";
+const T = (k, vars) => {
+  let s = (I18N[lang] && I18N[lang][k]) || k;
+  if (vars) for (const p in vars) s = s.replace("{" + p + "}", vars[p]);
+  return s;
+};
+
+function applyLang(){
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = T(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = T(el.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = T(el.dataset.i18nPh); });
+  document.getElementById("lang").textContent = lang === "th" ? "EN" : "TH";
+  document.documentElement.lang = lang;
+  renderTags(); renderBroth();
+  if (S.screen) setTopbar(S.screen);
+  if (S.screen === "duo") renderDeck();
+  if (S.screen === "chat") { document.getElementById("room-sub").textContent = roomSub(); refreshLeaveBtn(); }
+  if (S.screen === "confirm") document.getElementById("cf-p").textContent = T(S.group === "duo" ? "cf_duo" : "cf_gang");
+  if (S.screen === "win" || S.screen === "lose") renderResult();
+  if (!document.getElementById("sheet").hidden) openSheet();
+}
+
+/* ---------- js/data.js ---------- */
+"use strict";
+
+/* ==================== data ==================== */
+const AVATARS = ["🦊","🐼","🐧","🐙","🦖","🐝","🦉","🐳","🍜","🌶️"];
+
+const TAGS = [
+  {id:"cafe",  th:"คาเฟ่ฮอปปิ้ง", en:"café hopping"},
+  {id:"film",  th:"ดูหนัง",       en:"films"},
+  {id:"gym",   th:"ออกกำลังกาย",  en:"working out"},
+  {id:"music", th:"ฟังเพลงสด",    en:"live music"},
+  {id:"cat",   th:"ทาสแมว",       en:"cat person"},
+  {id:"game",  th:"บอร์ดเกม",     en:"board games"},
+  {id:"travel",th:"เที่ยวต่างจังหวัด", en:"weekend trips"},
+  {id:"cook",  th:"ทำอาหาร",      en:"cooking"},
+  {id:"photo", th:"ถ่ายรูป",      en:"photography"},
+  {id:"night", th:"สายกินดึก",    en:"late-night eater"}
+];
+
+const BROTHS = [
+  {id:"tomyum", th:"ต้มยำ",   en:"tom yum"},
+  {id:"clear",  th:"น้ำใส",   en:"clear"},
+  {id:"tonkotsu",th:"ทงคตสึ", en:"tonkotsu"},
+  {id:"miso",   th:"มิโซะ",   en:"miso"}
+];
+
+const GENDERS = [
+  {id:"f", sym:"♀", th:"หญิง",   en:"Woman"},
+  {id:"m", sym:"♂", th:"ชาย",   en:"Man"},
+  {id:"x", sym:"⚧", th:"LGBTQ+", en:"LGBTQ+"}
+];
+
+const DATE_PREFS = [
+  {id:"f",   th:"ผู้หญิง", en:"Women"},
+  {id:"m",   th:"ผู้ชาย",  en:"Men"},
+  {id:"all", th:"ทุกเพศ",   en:"Everyone"}
+];
+
+const PROFILES = [
+  {av:"🧋", age:24, g:"f", chance:.62,
+   th:{n:"ใบเฟิร์น",job:"ครีเอทีฟเอเจนซี่",bio:"เลิกงานสามทุ่มแต่ยังไหวถ้าเป็นหม้อไฟ ขอจองหน้าที่ตักลูกชิ้นให้",tg:["คาเฟ่ฮอปปิ้ง","ดูหนังผี","ต้มยำเผ็ดสุด"]},
+   en:{n:"Baifern",job:"creative agency",bio:"Off work at nine and still up for hot pot. I'm calling dibs on ladling the meatballs.",tg:["café hopping","horror films","extra-spicy tom yum"]}},
+  {av:"🎧", age:27, g:"m", chance:.55,
+   th:{n:"ตะวัน",job:"โปรดิวเซอร์เพลง",bio:"มีเพลย์ลิสต์สำหรับทุกอารมณ์ รวมถึงอารมณ์รอน้ำซุปเดือด",tg:["อินดี้","วิ่งสวนลุม","ซุปกระดูกหมู"]},
+   en:{n:"Tawan",job:"music producer",bio:"I have a playlist for every mood, including waiting-for-the-broth-to-boil.",tg:["indie","running","pork bone broth"]}},
+  {av:"🐈", age:23, g:"f", chance:.6,
+   th:{n:"มะปราง",job:"นักเรียนสัตวแพทย์",bio:"เลี้ยงแมวสามตัว กินผักมากกว่าเนื้อ แต่ไม่เคยพลาดเต้าหู้ไข่",tg:["ทาสแมว","ปลูกต้นไม้","น้ำใส"]},
+   en:{n:"Maprang",job:"vet student",bio:"Three cats, more veggies than meat, but I never skip the egg tofu.",tg:["cat person","plants","clear broth"]}},
+  {av:"🏀", age:29, g:"m", chance:.5,
+   th:{n:"กันต์",job:"วิศวกร",bio:"เถียงเรื่องจิ้มจุ่มกับสุกี้ได้ยาวสองชั่วโมง เตรียมตัวมาดีๆ",tg:["บาส","บอร์ดเกม","น้ำจิ้มสูตรลับ"]},
+   en:{n:"Kan",job:"engineer",bio:"I can argue jim jum versus suki for two hours straight. Come prepared.",tg:["basketball","board games","secret dipping sauce"]}},
+  {av:"📷", age:26, g:"f", chance:.58,
+   th:{n:"ปูเป้",job:"ช่างภาพอิสระ",bio:"ถ่ายรูปอาหารก่อนกินทุกครั้ง ขอเวลา 15 วิ สัญญาว่าไม่นาน",tg:["ฟิล์ม","เชียงใหม่","หมูสไลด์"]},
+   en:{n:"Poupée",job:"freelance photographer",bio:"I photograph every dish before eating. Fifteen seconds, I promise.",tg:["film cameras","Chiang Mai","sliced pork"]}},
+  {av:"👨‍🍳", age:25, g:"m", chance:.65,
+   th:{n:"อาร์ม",job:"ผู้ช่วยเชฟ",bio:"ทำอาหารให้คนอื่นทั้งวัน วันหยุดเลยอยากให้ใครสักคนตักให้บ้าง",tg:["ทำขนม","วิ่งเทรล","มิโซะ"]},
+   en:{n:"Arm",job:"line cook",bio:"I cook for people all day. On my day off I'd like someone to serve me for once.",tg:["baking","trail running","miso"]}},
+  {av:"🧘", age:28, g:"f", chance:.6,
+   th:{n:"แพรว",job:"ครูสอนโยคะ",bio:"ตื่นตีห้าทุกวัน แต่ยอมอดนอนเพื่อหม้อไฟรอบดึกได้เสมอ",tg:["โยคะ","ตลาดนัด","เต้าหู้อ่อน"]},
+   en:{n:"Praew",job:"yoga teacher",bio:"Up at five every day, but I'll always lose sleep for a late-night pot.",tg:["yoga","farmers markets","silken tofu"]}},
+  {av:"☕", age:26, g:"m", chance:.57,
+   th:{n:"โต้ง",job:"บาริสต้า",bio:"จำสูตรกาแฟลูกค้าได้ทุกคน แต่จำชื่อตัวเองไม่ค่อยได้",tg:["กาแฟ","แผ่นเสียง","ซุปต้มยำ"]},
+   en:{n:"Tong",job:"barista",bio:"I remember every regular's order but not always my own name.",tg:["coffee","vinyl","tom yum broth"]}},
+  {av:"🎨", age:25, g:"x", chance:.63,
+   th:{n:"มินท์",job:"กราฟิกดีไซเนอร์",bio:"เลือกสีนานกว่าเลือกเมนู ขอโทษล่วงหน้า",tg:["งานคราฟต์","สะสมสติกเกอร์","เห็ดหอม"]},
+   en:{n:"Mint",job:"graphic designer",bio:"I take longer picking a colour than picking a dish. Apologising in advance.",tg:["craft fairs","stickers","shiitake"]}},
+  {av:"🌙", age:27, g:"x", chance:.6,
+   th:{n:"เรน",job:"นักเขียนอิสระ",bio:"เขียนงานตอนตีสอง กินข้าวตอนตีสาม หาคนนอนดึกเหมือนกัน",tg:["หนังสือ","ร้านเหล้าเล็กๆ","วุ้นเส้น"]},
+   en:{n:"Rain",job:"freelance writer",bio:"I write at 2am and eat at 3am. Looking for someone on the same schedule.",tg:["books","tiny bars","glass noodles"]}}
+];
+
+const DUO_SCRIPT = {
+  th:["สวัสดี! เห็นในโปรไฟล์ว่าชอบกินดึกเหมือนกัน 👀","ปกติสั่งน้ำซุปอะไรอะ เราต้มยำตลอด",
+      "เผ็ดได้แค่ไหน ถามไว้ก่อนจะได้ไม่ต้องแย่งหม้อกัน 😆","ถ้ามีเวลาว่างศุกร์นี้ ไปลองร้านนี้กันไหม",
+      "โอเคเลย งั้นเจอกันนะ 🍲"],
+  en:["Hi! Your profile says late-night eater too 👀","What broth do you usually order? I'm tom yum, always.",
+      "How spicy can you go? Asking so we don't fight over the pot 😆","If Friday's free, want to try this place?",
+      "Perfect — see you there 🍲"]
+};
+
+const GANG_PEOPLE = [
+  {av:"🦖", th:"โดโด้", en:"Dodo"}, {av:"🐝", th:"น้ำผึ้ง", en:"Peung"},
+  {av:"🐙", th:"ปลาหมึก", en:"Muek"}, {av:"🦉", th:"อุ๋ย", en:"Ou"},
+  {av:"🐼", th:"หมีพู", en:"Poo"}, {av:"🐧", th:"เพนกวิน", en:"Pen"},
+  {av:"🌶️", th:"พริก", en:"Prik"}, {av:"🍜", th:"เส้นใหญ่", en:"Yai"},
+  {av:"🦊", th:"ฟ็อกซ์", en:"Fox"}, {av:"🐳", th:"วาฬ", en:"Wan"}
+];
+
+const ROOMS = [
+  {th:"โต๊ะ 7 · หม้อต้มยำ", en:"Table 7 · Tom Yum Pot"},
+  {th:"โต๊ะ 12 · หม้อน้ำใส", en:"Table 12 · Clear Pot"},
+  {th:"โต๊ะ 3 · หม้อคู่", en:"Table 3 · Split Pot"},
+  {th:"โต๊ะ 21 · หม้อมิโซะ", en:"Table 21 · Miso Pot"},
+  {th:"โต๊ะ 9 · หม้อเผ็ดสุด", en:"Table 9 · Devil Pot"}
+];
+
+const GANG_SCRIPTS = {
+  th:[
+    ["ห้องนี้เงียบจัง ทักก่อนละกัน 👋","ใครสั่งเผ็ดได้บ้าง ยกมือ 🙋","เราเผ็ดน้อยแต่กินเยอะ ชดเชยกันได้ปะ 😂",
+     "เอาจริงๆ สุกี้ต้องมีวุ้นเส้น ไม่มีไม่ได้","งั้นนัดกันจริงจังเลยไหม","โอเค เราว่าห้องนี้ใช้ได้นะ 🍲"],
+    ["มาแล้วครับ มาจากอ่อนนุช 🚇","เราเพิ่งเลิกงาน หิวมาก","ใครกินเนื้อ ใครกินหมู แบ่งฝั่งหม้อกันเลย",
+     "ขอโหวตน้ำจิ้มสูตรร้านนะ อย่ามาผสมเอง 😤","แก๊งนี้ดูจะกินได้จริง","เอาด้วย นัดวันเลย"],
+    ["ใครมาจากฝั่งธนบ้าง ✋","เราเป็นสายของหวานก่อนกินข้าว ผิดไหม","ไม่ผิด แต่ต้องแบ่ง 😆",
+     "งั้นเรารับหน้าที่จองโต๊ะละกัน","ห้องนี้พลังงานดีมาก","อยู่ต่อดีกว่า ไม่สุ่มแล้ว"]
+  ],
+  en:[
+    ["Quiet room — I'll go first 👋","Who can handle spicy? Hands up 🙋","Low spice, high volume. Balances out, right? 😂",
+     "Honestly, suki without glass noodles isn't suki","Should we actually plan this?","Okay, this room works for me 🍲"],
+    ["Here! Coming from On Nut 🚇","Just got off work, starving","Beef people, pork people — split the pot",
+     "Voting for the house sauce. No custom mixing 😤","This gang can actually eat","I'm in. Let's pick a day"],
+    ["Anyone from Thonburi side? ✋","I'm a dessert-before-dinner person. Wrong?","Not wrong, but you're sharing 😆",
+     "I'll take booking duty then","Good energy in this room","Staying. No more rerolls."]
+  ]
+};
+
+/* ---------- js/app.js ---------- */
+"use strict";
+
+/* ==================== state ==================== */
+const S = {
+  screen:"home", group:null, rerolls:0,
+  me:{name:"", age:"", av:AVATARS[0], bio:"", tags:[], broth:"tomyum", gender:"f", pref:"all"},
+  deck:[],
+  deckIdx:0, partner:null,
+  room:null, members:[], scriptSet:0, scriptIdx:0, swiping:false,
+  timers:[], secs:24, confirmed:false, result:null
+};
+
+const $ = id => document.getElementById(id);
+const rand = n => Math.floor(Math.random() * n);
+const pick = a => a[rand(a.length)];
+const luckBonus = () => Math.min(S.rerolls * 0.03, 0.18);
+
+function clearTimers(){ S.timers.forEach(clearTimeout); S.timers = []; }
+function later(fn, ms){ const t = setTimeout(fn, ms); S.timers.push(t); return t; }
+
+function code(prefix){
+  const A = "ACDEFHJKLMNPRTUVWXY349";
+  let s = "";
+  for (let i = 0; i < 4; i++) s += A[rand(A.length)];
+  return prefix + "-" + s;
+}
+
+/* ==================== navigation ==================== */
+const TB = {home:"tb_home", bio:"tb_bio", duo:"tb_duo", chat:"tb_chat", confirm:"tb_confirm", win:"tb_win", lose:"tb_lose"};
+const BACK_TO = {bio:"home", duo:"bio", chat:null, confirm:null, win:null, lose:null};
+
+function setTopbar(id){
+  $("tbv").textContent = T(TB[id] || "tb_home");
+  const b = BACK_TO[id];
+  $("back").hidden = !b;
+}
+
+function go(id){
+  S.screen = id;
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("on"));
+  $("sc-" + id).classList.add("on");
+  setTopbar(id);
+}
+
+$("back").addEventListener("click", () => {
+  const b = BACK_TO[S.screen];
+  if (b) go(b);
+});
+
+function updateLuck(){
+  $("luckbar").style.width = Math.round((0.12 + luckBonus() * 4.4) * 100) + "%";
+}
+
+/* ==================== language toggle ==================== */
+$("lang").addEventListener("click", () => {
+  lang = lang === "th" ? "en" : "th";
+  store.set("mml.lang", lang);
+  applyLang();
+});
+
+/* ==================== bio form ==================== */
+function renderAvatars(){
+  const wrap = $("f-av");
+  wrap.innerHTML = "";
+  AVATARS.forEach(a => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "av"; b.textContent = a;
+    b.setAttribute("aria-pressed", String(a === S.me.av));
+    b.addEventListener("click", () => {
+      S.me.av = a;
+      wrap.querySelectorAll(".av").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    });
+    wrap.appendChild(b);
+  });
+}
+
+function renderTags(){
+  const wrap = $("f-tags");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  TAGS.forEach(t => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = t[lang];
+    b.setAttribute("aria-pressed", String(S.me.tags.includes(t.id)));
+    b.addEventListener("click", () => {
+      const i = S.me.tags.indexOf(t.id);
+      if (i > -1) S.me.tags.splice(i, 1); else S.me.tags.push(t.id);
+      b.setAttribute("aria-pressed", String(S.me.tags.includes(t.id)));
+    });
+    wrap.appendChild(b);
+  });
+}
+
+function renderPicker(elId, opts, key, label, after){
+  const wrap = $(elId);
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  opts.forEach(t => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = label(t);
+    b.setAttribute("aria-pressed", String(S.me[key] === t.id));
+    b.addEventListener("click", () => {
+      S.me[key] = t.id;
+      wrap.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      if (after) after();
+    });
+    wrap.appendChild(b);
+  });
+}
+
+// how many people the current preference actually leaves to swipe
+function updatePrefCount(){
+  const n = matchPool().length;
+  const el = $("pref-count");
+  el.textContent = n ? T("pref_count", {n: n}) : T("pref_none");
+  el.style.color = n ? "var(--ink-2)" : "var(--chili)";
+}
+
+function renderBroth(){
+  renderPicker("f-broth", BROTHS, "broth", t => t[lang]);
+  renderPicker("f-gender", GENDERS, "gender", t => t.sym + "  " + t[lang]);
+  renderPicker("f-pref", DATE_PREFS, "pref", t => t[lang], updatePrefCount);
+  updatePrefCount();
+}
+
+function loadMe(){
+  const raw = store.get("mml.me");
+  if (!raw) return;
+  try {
+    const m = JSON.parse(raw);
+    if (m && typeof m === "object") {
+      S.me.name = m.name || ""; S.me.age = m.age || "";
+      S.me.av = AVATARS.includes(m.av) ? m.av : AVATARS[0];
+      S.me.bio = m.bio || "";
+      S.me.tags = Array.isArray(m.tags) ? m.tags.filter(t => TAGS.some(x => x.id === t)) : [];
+      S.me.broth = BROTHS.some(b => b.id === m.broth) ? m.broth : "tomyum";
+      S.me.gender = GENDERS.some(g => g.id === m.gender) ? m.gender : "f";
+      S.me.pref = DATE_PREFS.some(d => d.id === m.pref) ? m.pref : "all";
+    }
+  } catch(e){}
+  $("f-name").value = S.me.name;
+  $("f-age").value = S.me.age;
+  $("f-bio").value = S.me.bio;
+}
+
+$("bio-go").addEventListener("click", () => {
+  const name = $("f-name").value.trim();
+  if (!name) { $("f-name").focus(); $("f-name").placeholder = T("need_name"); return; }
+  S.me.name = name;
+  S.me.age = $("f-age").value.trim();
+  S.me.bio = $("f-bio").value.trim();
+  store.set("mml.me", JSON.stringify(S.me));
+  if (S.group === "duo") startDuo(); else startGang();
+});
+
+document.querySelectorAll(".gcard").forEach(c => {
+  c.addEventListener("click", () => { S.group = c.dataset.group; go("bio"); });
+});
+
+/* ==================== duo: swipe deck ==================== */
+function renderDeck(){
+  const deck = $("deck");
+  deck.querySelectorAll(".card").forEach(c => c.remove());
+  const remaining = S.deck.slice(S.deckIdx);
+  $("deck-empty").hidden = remaining.length > 0;
+  // render at most 3, topmost last so it sits on top
+  remaining.slice(0, 3).reverse().forEach((p, i, arr) => {
+    const depth = arr.length - 1 - i;   // 0 = top
+    const L = p[lang];
+    const el = document.createElement("div");
+    el.className = "card";
+    el.style.transform = "translateY(" + (depth * 7) + "px) scale(" + (1 - depth * 0.03) + ")";
+    el.style.zIndex = String(10 - depth);
+    const gd = GENDERS.find(g => g.id === p.g) || GENDERS[0];
+    el.innerHTML =
+      '<div class="face"><span class="face-ring"></span></div>' +
+      '<div class="meat">' +
+        '<div class="job"></div>' +
+        '<div class="who"><b></b><span></span><i class="gchip"></i></div>' +
+        '<div class="bio"></div>' +
+        '<div class="tg">' + L.tg.map(() => "<em></em>").join("") + '</div>' +
+      '</div>' +
+      '<div class="stamp like">LIKE</div><div class="stamp pass">PASS</div>';
+    el.querySelector(".face-ring").textContent = p.av;
+    el.querySelector(".job").textContent = L.job;
+    el.querySelector(".who b").textContent = L.n;
+    el.querySelector(".who span").textContent = p.age;
+    el.querySelector(".gchip").textContent = gd.sym + " " + gd[lang];
+    el.querySelector(".bio").textContent = L.bio;
+    el.querySelectorAll(".tg em").forEach((em, k) => { em.textContent = L.tg[k]; });
+    if (depth === 0){ el.classList.add("top"); makeDraggable(el); }
+    deck.appendChild(el);
+  });
+}
+
+function makeDraggable(el){
+  let sx = 0, dx = 0, dragging = false;
+  const like = el.querySelector(".stamp.like"), pass = el.querySelector(".stamp.pass");
+
+  el.addEventListener("pointerdown", e => {
+    dragging = true; sx = e.clientX; el.setPointerCapture(e.pointerId);
+    el.style.transition = "none";
+  });
+  el.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    dx = e.clientX - sx;
+    el.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 22) + "deg)";
+    like.style.opacity = dx > 30 ? Math.min(1, (dx - 30) / 70) : 0;
+    pass.style.opacity = dx < -30 ? Math.min(1, (-dx - 30) / 70) : 0;
+  });
+  const end = () => {
+    if (!dragging) return;
+    dragging = false;
+    el.style.transition = "transform .3s ease, opacity .3s ease";
+    if (Math.abs(dx) > 95) { swipe(dx > 0); }
+    else { el.style.transform = "translateX(0) rotate(0)"; like.style.opacity = 0; pass.style.opacity = 0; }
+    dx = 0;
+  };
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+
+function swipe(liked){
+  if (S.swiping) return;                 // ignore taps while a card is flying out
+  const p = S.deck[S.deckIdx];
+  if (!p) return;
+  S.swiping = true;
+  const top = $("deck").querySelector(".card.top");
+  if (top) top.classList.remove("top");
+  if (top){
+    top.style.transition = "transform .32s ease, opacity .32s ease";
+    top.style.transform = "translateX(" + (liked ? 520 : -520) + "px) rotate(" + (liked ? 24 : -24) + "deg)";
+    top.style.opacity = "0";
+  }
+  S.deckIdx++;
+  const matched = liked && Math.random() < Math.min(0.92, p.chance + luckBonus());
+  setTimeout(() => {
+    S.swiping = false;
+    if (matched){ S.partner = p; showBurst(p); }
+    else renderDeck();
+  }, 330);
+}
+
+$("d-like").addEventListener("click", () => swipe(true));
+$("d-pass").addEventListener("click", () => swipe(false));
+
+function showBurst(p){
+  const b = $("burst");
+  $("burst-sub").textContent = T("burst_sub", {n: p[lang].n});
+  b.classList.add("on");
+  setTimeout(() => { b.classList.remove("on"); openDuoChat(p); }, 1500);
+}
+
+/* ==================== chat (duo + gang) ==================== */
+function roomSub(){
+  if (S.group === "duo") return T("tonight");
+  return T("seatN", {n: S.members.length});
+}
+
+function refreshLeaveBtn(){
+  const duo = S.group === "duo";
+  // gang steers the room; duo decides on one person
+  $("leave").hidden   = duo;
+  $("tovote").hidden  = duo;
+  $("duo-no").hidden  = !duo;
+  $("duo-yes").hidden = !duo;
+  $("clock").hidden   = duo;
+  $("facebtn").hidden = !duo;
+  $("seats").hidden   = duo;   // the face icon already is the other person
+  if (duo && S.partner) $("fb-av").textContent = S.partner.av;
+}
+
+/* The face icon opens the full profile of whoever you are talking to, so the
+   match decision is made looking at them rather than at a name in a bar. */
+function openSheet(){
+  const p = S.partner;
+  if (!p) return;
+  const L = p[lang];
+  $("sh-face").textContent = p.av;
+  $("sh-name").textContent = L.n;
+  $("sh-age").textContent  = p.age;
+  const gd = GENDERS.find(g => g.id === p.g) || GENDERS[0];
+  $("sh-job").textContent  = L.job + " · " + gd.sym + " " + gd[lang];
+  $("sh-bio").textContent  = L.bio;
+  $("sh-tags").innerHTML   = L.tg.map(() => "<em></em>").join("");
+  $("sh-tags").querySelectorAll("em").forEach((em, i) => { em.textContent = L.tg[i]; });
+  $("sheet").hidden = false;
+}
+function closeSheet(){ $("sheet").hidden = true; }
+
+function duoMatch(){ closeSheet(); openConfirm(); }
+
+function duoPass(){
+  closeSheet();
+  clearTimers();
+  const name = S.partner ? S.partner[lang].n : "";
+  bubble(null, T("sys_passed", {n: name}), "sys");
+  S.partner = null;
+  setTimeout(() => {
+    if (S.deckIdx < S.deck.length) { renderDeck(); go("duo"); }
+    else finish(false);              // nobody left to meet today
+  }, 1100);
+}
+
+$("facebtn").addEventListener("click", openSheet);
+$("sheet-x").addEventListener("click", closeSheet);
+$("sheet").addEventListener("click", e => { if (e.target === $("sheet")) closeSheet(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+$("duo-yes").addEventListener("click", duoMatch);
+$("sh-yes").addEventListener("click", duoMatch);
+$("duo-no").addEventListener("click", duoPass);
+$("sh-no").addEventListener("click", duoPass);
+
+function renderSeats(){
+  const wrap = $("seats");
+  wrap.innerHTML = "";
+  S.members.forEach(m => {
+    const d = document.createElement("div");
+    d.className = "seat" + (m.me ? " me" : "");
+    d.textContent = m.av;
+    d.title = m.name;
+    wrap.appendChild(d);
+  });
+}
+
+function bubble(who, text, cls){
+  const thread = $("thread");
+  const el = document.createElement("div");
+  el.className = "msg " + (cls || "");
+  if (cls === "sys"){
+    el.innerHTML = '<div class="body"><div class="bub"></div></div>';
+    el.querySelector(".bub").textContent = text;
+  } else {
+    el.innerHTML = '<div class="ava"></div><div class="body"><div class="nm"></div><div class="bub"></div></div>';
+    el.querySelector(".ava").textContent = who.av;
+    el.querySelector(".nm").textContent = who.name;
+    el.querySelector(".bub").textContent = text;
+  }
+  thread.appendChild(el);
+  thread.scrollTop = thread.scrollHeight;
+  return el;
+}
+
+function typingThen(who, text, delay){
+  const thread = $("thread");
+  const t = document.createElement("div");
+  t.className = "msg typing";
+  t.innerHTML = '<div class="ava"></div><div class="body"><div class="bub"><i></i><i></i><i></i></div></div>';
+  t.querySelector(".ava").textContent = who.av;
+  thread.appendChild(t);
+  thread.scrollTop = thread.scrollHeight;
+  later(() => { t.remove(); bubble(who, text); }, delay);
+}
+
+function openDuoChat(p){
+  clearTimers();
+  S.group = "duo";
+  S.partner = p;
+  S.scriptIdx = 0;
+  const L = p[lang];
+  S.members = [
+    {av: S.me.av, name: S.me.name, me: true},
+    {av: p.av, name: L.n}
+  ];
+  $("thread").innerHTML = "";
+  $("room-name").textContent = L.n;
+  $("room-sub").textContent = roomSub();
+  renderSeats(); refreshLeaveBtn();
+  go("chat");
+  bubble(null, T("sys_tapface"), "sys");
+  // two opening lines land on their own; scriptIdx resumes from line 2 when you reply
+  const who = S.members[1];
+  const duoLine = i => DUO_SCRIPT[lang][Math.min(i, DUO_SCRIPT[lang].length - 1)];
+  typingThen(who, duoLine(0), 900);
+  later(() => typingThen(who, duoLine(1), 1100), 2600);
+  S.scriptIdx = 2;
+}
+
+function matchPool(){
+  return S.me.pref === "all" ? PROFILES : PROFILES.filter(p => p.g === S.me.pref);
+}
+
+function startDuo(){
+  const pool = matchPool();
+  S.deck = pool.slice();
+  for (let i = S.deck.length - 1; i > 0; i--){          // shuffle so runs differ
+    const j = rand(i + 1);
+    [S.deck[i], S.deck[j]] = [S.deck[j], S.deck[i]];
+  }
+  S.deckIdx = 0;
+  if (!S.deck.length) { finish(false); return; }        // preference left nobody
+  renderDeck();
+  go("duo");
+}
+
+/* ==================== gang room ==================== */
+function startGang(){
+  S.group = "gang";
+  newRoom(false);
+}
+
+function newRoom(isReroll){
+  clearTimers();
+  S.room = pick(ROOMS);
+  // store the SET index, not the lines — lines are resolved in the active
+  // language at the moment each one fires
+  S.scriptSet = rand(GANG_SCRIPTS[lang].length);
+  S.scriptIdx = 0;
+  S.secs = 24;
+  S.confirmed = false;
+
+  const pool = GANG_PEOPLE.slice();
+  const three = [];
+  for (let i = 0; i < 3; i++) three.push(pool.splice(rand(pool.length), 1)[0]);
+  S.members = [{av: S.me.av, name: S.me.name, me: true}]
+    .concat(three.map(p => ({av: p.av, name: p[lang], vote: null})));
+
+  $("thread").innerHTML = "";
+  $("room-name").textContent = S.room[lang];
+  $("room-sub").textContent = roomSub();
+  renderSeats(); refreshLeaveBtn();
+  go("chat");
+
+  bubble(null, isReroll ? T("sys_reroll", {n: S.rerolls}) : T("sys_join"), "sys");
+  tickClock();
+  scheduleGangChat();
+}
+
+const gangLines = () => GANG_SCRIPTS[lang][S.scriptSet] || [];
+const gangLine  = i => { const L = gangLines(); return L[Math.min(i, L.length - 1)]; };
+
+function scheduleGangChat(){
+  const others = S.members.filter(m => !m.me);
+  let t = 1200;
+  gangLines().forEach((_, i) => {
+    const who = others[i % others.length];
+    later(() => typingThen(who, gangLine(i), 800), t);
+    t += 2600 + rand(900);
+  });
+}
+
+function tickClock(){
+  const c = $("clock");
+  c.textContent = "0:" + String(S.secs).padStart(2, "0");
+  c.classList.toggle("urgent", S.secs <= 8);
+  if (S.secs <= 0){
+    bubble(null, T("sys_time"), "sys");
+    later(openConfirm, 900);
+    return;
+  }
+  S.secs--;
+  later(tickClock, 1000);
+}
+
+$("leave").addEventListener("click", () => {
+  clearTimers();
+  bubble(null, T("sys_left"), "sys");
+  S.rerolls++;
+  updateLuck();
+  setTimeout(() => newRoom(true), 700);
+});
+
+$("tovote").addEventListener("click", () => { clearTimers(); openConfirm(); });
+
+$("composer").addEventListener("submit", e => {
+  e.preventDefault();
+  const input = $("msg");
+  const text = input.value.trim();
+  if (!text) return;
+  bubble(S.members[0], text, "me");
+  input.value = "";
+  if (S.group === "duo"){
+    const line = DUO_SCRIPT[lang][Math.min(S.scriptIdx, DUO_SCRIPT[lang].length - 1)];
+    S.scriptIdx++;
+    typingThen(S.members[1], line, 800 + rand(500));
+  } else {
+    const others = S.members.filter(m => !m.me);
+    if (others.length){
+      const line = gangLine(S.scriptIdx++);
+      if (line) typingThen(pick(others), line, 700 + rand(600));
+    }
+  }
+});
+
+/* ==================== confirm ==================== */
+function openConfirm(){
+  clearTimers();
+  closeSheet();
+  S.confirmed = false;
+  $("cf-p").textContent = T(S.group === "duo" ? "cf_duo" : "cf_gang");
+  $("cf-status").textContent = T("cf_wait");
+  $("cf-yes").disabled = false;
+  $("cf-no").hidden = false;
+  renderVotes();
+  go("confirm");
+}
+
+function renderVotes(){
+  const wrap = $("votes");
+  wrap.innerHTML = "";
+  S.members.forEach(m => {
+    const d = document.createElement("div");
+    d.className = "vote";
+    d.innerHTML = '<div class="face"></div><div class="nm"></div><div class="st"></div>';
+    d.querySelector(".face").textContent = m.av;
+    d.querySelector(".nm").textContent = m.name;
+    wrap.appendChild(d);
+    m.el = d;
+  });
+}
+
+$("cf-no").addEventListener("click", () => {
+  if (S.group === "duo") go("chat");
+  else { S.secs = 12; go("chat"); tickClock(); scheduleGangChat(); }
+});
+
+$("cf-yes").addEventListener("click", () => {
+  if (S.confirmed) return;
+  S.confirmed = true;
+  $("cf-yes").disabled = true;
+  $("cf-no").hidden = true;
+  $("cf-status").textContent = T("cf_counting");
+
+  const me = S.members[0];
+  me.el.classList.add("yes");
+  me.el.querySelector(".st").textContent = "✅";
+
+  const others = S.members.filter(m => !m.me);
+  const base = S.group === "duo" ? 0.62 : 0.62;
+  let yes = 1;
+
+  others.forEach((m, i) => {
+    later(() => {
+      const ok = Math.random() < Math.min(0.95, base + luckBonus());
+      if (ok) yes++;
+      m.el.classList.add(ok ? "yes" : "no");
+      m.el.querySelector(".st").textContent = ok ? "✅" : "❎";
+      if (i === others.length - 1) later(() => resolveVote(yes), 900);
+    }, 800 + i * 750);
+  });
+});
+
+/* Gang: 3-4 confirmations seal the match. Exactly 2 is a near miss — the room
+   dissolves and you are dropped straight into a new one (your luck carries over).
+   Only a lone vote ends the run, and that is where the Lucky Dessert comes in. */
+function resolveVote(yes){
+  if (S.group === "duo") { finish(yes >= 2); return; }
+  if (yes >= 3) { finish(true); return; }
+  if (yes === 2) { nearMiss(yes); return; }
+  finish(false);
+}
+
+function nearMiss(yes){
+  clearTimers();
+  $("cf-status").textContent = T("cf_near", {n: yes});
+  S.rerolls++;
+  updateLuck();
+  setTimeout(() => newRoom(true), 2100);
+}
+
+/* ==================== results ==================== */
+// Codes are generated once per result; the language-dependent copy around them
+// re-renders whenever the language changes.
+function renderResult(){
+  const r = S.result;
+  if (!r) return;
+  if (r.won){
+    $("win-sub").textContent = r.group === "duo" ? T("win_duo", {n: r.partner}) : T("win_gang");
+    $("w-when").textContent = T("when_val");
+    $("w-table").textContent = r.group === "duo" ? "A-04" : "B-11";
+    $("w-who").textContent = T("people", {n: r.group === "duo" ? 2 : 4});
+    $("w-code").textContent = r.code;
+    $("w-vcode").textContent = r.vcode;
+  } else {
+    $("l-code").textContent = r.code;
+  }
+}
+
+function finish(won){
+  clearTimers();
+  S.result = {
+    won: won,
+    group: S.group,
+    partner: S.members[1] ? S.members[1].name : "",
+    code: won ? code("FIRST") : code("DESSERT100"),
+    vcode: won ? code("LUCKY10") : ""
+  };
+  store.set("mml.voucher", won ? "LUCKY10" : "DESSERT100");
+  renderResult();
+  go(won ? "win" : "lose");
+}
+
+document.querySelectorAll("[data-restart]").forEach(b => {
+  b.addEventListener("click", () => {
+    clearTimers();
+    S.group = null; S.deckIdx = 0; S.deck = []; S.partner = null;
+    S.members = []; S.scriptIdx = 0; S.confirmed = false; S.swiping = false;
+    go("home");
+  });
+});
+
+/* ==================== broth canvas ==================== */
+(function broth(){
+  const cv = $("broth");
+  if (!cv) return;
+  const ctx = cv.getContext("2d");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w = 0, h = 0, bubbles = [];
+
+  function readColors(){
+    const cs = getComputedStyle(document.documentElement);
+    return {
+      a: cs.getPropertyValue("--broth-a").trim(),
+      b: cs.getPropertyValue("--broth-b").trim(),
+      alpha: parseFloat(cs.getPropertyValue("--broth-alpha")) || .5
+    };
+  }
+  let C = readColors();
+
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = cv.clientWidth; h = cv.clientHeight;
+    cv.width = w * dpr; cv.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.max(14, Math.round(w * h / 26000));
+    bubbles = Array.from({length: n}, () => spawn(true));
+  }
+  function spawn(anywhere){
+    return {
+      x: Math.random() * w,
+      y: anywhere ? Math.random() * h : h + 30,
+      r: 5 + Math.random() * 34,
+      v: 0.12 + Math.random() * 0.42,
+      drift: (Math.random() - 0.5) * 0.28,
+      t: Math.random() * 6.28
+    };
+  }
+  function frame(){
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < bubbles.length; i++){
+      const b = bubbles[i];
+      b.y -= b.v; b.t += 0.012;
+      const x = b.x + Math.sin(b.t) * 14;
+      const mix = Math.min(1, b.r / 34);
+      const col = mix > .5 ? C.b : C.a;
+      const g = ctx.createRadialGradient(x, b.y, 0, x, b.y, b.r);
+      g.addColorStop(0, "rgba(" + col + "," + (C.alpha * 0.5) + ")");
+      g.addColorStop(1, "rgba(" + col + ",0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, b.y, b.r, 0, 6.2832); ctx.fill();
+      if (b.y + b.r < -10) bubbles[i] = spawn(false);
+    }
+    requestAnimationFrame(frame);
+  }
+  window.addEventListener("resize", () => { resize(); C = readColors(); });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { C = readColors(); });
+  resize();
+  if (reduce){
+    // one static frame, no motion
+    ctx.clearRect(0, 0, w, h);
+    bubbles.forEach(b => {
+      const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+      g.addColorStop(0, "rgba(" + C.a + "," + (C.alpha * 0.4) + ")");
+      g.addColorStop(1, "rgba(" + C.a + ",0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 6.2832); ctx.fill();
+    });
+  } else {
+    frame();
+  }
+})();
+
+/* ==================== boot ==================== */
+renderAvatars();
+loadMe();
+applyLang();
+updateLuck();
+go("home");
+</script>

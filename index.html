@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Match Me Lucky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<canvas id="broth" aria-hidden="true"></canvas>
+
+<div class="wrap">
+
+  <!-- ================= left rail ================= -->
+  <div class="rail">
+    <div class="eyebrow" data-i18n="eyebrow">Lucky Suki × Campaign</div>
+
+    <div class="logo">
+      <b>Match me <i>Lucky</i></b>
+      <span data-i18n="tagline">จับคู่ให้ดวงพาไป แล้วมาเจอกันที่หม้อเดียวกัน</span>
+    </div>
+
+    <p class="lede" data-i18n-html="lede"></p>
+
+    <div class="steps">
+      <div class="step"><div class="n">01</div><div><div class="t" data-i18n="s1t">เลือกกลุ่มของคุณ</div><div class="d" data-i18n="s1d">Lucky Duo หาคู่เดต หรือ Lucky Gang หาเพื่อนใหม่แบบ 4 คน</div></div></div>
+      <div class="step"><div class="n">02</div><div><div class="t" data-i18n="s2t">เขียนข้อมูลที่อยากให้เขารู้</div><div class="d" data-i18n="s2d">ไบโอ ความสนใจ และน้ำซุปที่คุณเลือกเสมอ</div></div></div>
+      <div class="step"><div class="n">03</div><div><div class="t" data-i18n="s3t">แมชในระบบออนไลน์</div><div class="d" data-i18n="s3d">ปัดโปรไฟล์ หรือเข้าห้องอัตโนมัติ แล้วกดยืนยันตอนจบ</div></div></div>
+      <div class="step"><div class="n">04</div><div><div class="t" data-i18n="s4t">เจอกันจริงที่ Lucky Suki</div><div class="d" data-i18n="s4d">ทุกคนได้ voucher กลับบ้าน ไม่ว่าผลจะออกทางไหน</div></div></div>
+    </div>
+
+    <div class="prizes">
+      <div class="prize win">
+        <div class="cap">Matched 💓✅</div>
+        <div class="big" data-i18n="pwb">ส่วนลด 10%</div>
+        <div class="why" data-i18n="pww">First Visit ที่ร้าน แล้วรับ voucher ไว้ใช้ครั้งถัดไป</div>
+      </div>
+      <div class="prize lose">
+        <div class="cap">No match ❎</div>
+        <div class="big" data-i18n="plb">Lucky Dessert ฿100</div>
+        <div class="why" data-i18n="plw">ดวงยังไม่มา แต่ของหวานมาแล้ว แลกได้ที่ร้านวันนี้</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= phone ================= -->
+  <div class="phone">
+    <div class="topbar">
+      <button class="iconbtn" id="back" hidden aria-label="Back">←</button>
+      <div class="tbtitle">
+        <div class="k" id="tbk">Match me Lucky</div>
+        <div class="v" id="tbv" data-i18n="tb_home">เลือกกลุ่มที่ใช่ของคุณ</div>
+      </div>
+      <div class="luck" title="Luck">
+        <span class="lbl">LUCK</span>
+        <span class="bar"><i id="luckbar"></i></span>
+      </div>
+      <button class="langbtn" id="lang">EN</button>
+    </div>
+
+    <div class="stage">
+
+      <!-- ---- home ---- -->
+      <section class="screen on" id="sc-home">
+        <div>
+          <h2 class="h-lg" data-i18n="home_h">วันนี้ดวงพาคุณไปทางไหน</h2>
+          <p class="muted" data-i18n="home_p">เลือกหนึ่งกลุ่ม แล้วปล่อยให้ระบบจับคู่ทำงาน</p>
+        </div>
+        <div class="stack grow">
+          <button class="gcard" data-group="duo">
+            <span class="pill" data-i18n="p2">2 คน</span>
+            <span class="ico">💘</span>
+            <span class="en">Lucky Duo</span>
+            <span class="nm" data-i18n="duo_nm">หาคู่เดตของคุณ</span>
+            <span class="ds" data-i18n="duo_ds">ปัดโปรไฟล์ทีละคน ถูกใจตรงกันเมื่อไหร่ก็เริ่มคุยได้เลย</span>
+          </button>
+          <button class="gcard" data-group="gang">
+            <span class="pill" data-i18n="p4">4 คน</span>
+            <span class="ico">🍲</span>
+            <span class="en">Lucky Gang</span>
+            <span class="nm" data-i18n="gang_nm">หาเพื่อนใหม่</span>
+            <span class="ds" data-i18n="gang_ds">ระบบสุ่มห้อง 4 คนให้อัตโนมัติ ไม่ถูกใจก็กดออกเพื่อสุ่มใหม่ได้เรื่อยๆ</span>
+          </button>
+        </div>
+        <p class="tiny center" data-i18n="home_f">ทุกการเล่นได้ voucher กลับบ้านเสมอ</p>
+      </section>
+
+      <!-- ---- bio ---- -->
+      <section class="screen" id="sc-bio">
+        <div>
+          <h2 class="h-md" data-i18n="bio_h">ข้อมูลเราที่อยากให้เขารู้</h2>
+          <p class="muted" data-i18n="bio_p">ยิ่งเป็นตัวเอง ยิ่งเจอคนที่ใช่</p>
+        </div>
+        <div class="stack grow scrolly">
+          <div class="row">
+            <div class="field" style="flex:2">
+              <label class="lab" for="f-name" data-i18n="l_name">ชื่อเล่น</label>
+              <input class="inp" id="f-name" maxlength="18" data-i18n-ph="ph_name" placeholder="เรียกเราว่า…">
+            </div>
+            <div class="field" style="flex:1">
+              <label class="lab" for="f-age" data-i18n="l_age">อายุ</label>
+              <input class="inp" id="f-age" type="number" min="18" max="80" placeholder="24">
+            </div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_av">รูปแทนตัว</span>
+            <div class="avs" id="f-av"></div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_gender">เพศของเรา</span>
+            <div class="chips" id="f-gender"></div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_pref">อยากเดทกับ</span>
+            <div class="chips" id="f-pref"></div>
+            <span class="tiny" id="pref-count"></span>
+          </div>
+          <div class="field">
+            <label class="lab" for="f-bio" data-i18n="l_bio">แนะนำตัวสั้นๆ</label>
+            <textarea class="ta" id="f-bio" maxlength="140" data-i18n-ph="ph_bio" placeholder="เล่าอะไรก็ได้ที่ทำให้เราน่าคุยด้วย"></textarea>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_tags">ความสนใจ</span>
+            <div class="chips" id="f-tags"></div>
+          </div>
+          <div class="field">
+            <span class="lab" data-i18n="l_broth">น้ำซุปประจำตัว</span>
+            <div class="chips" id="f-broth"></div>
+          </div>
+        </div>
+        <button class="btn primary wide" id="bio-go" data-i18n="bio_go">เริ่มหาคู่แมช</button>
+      </section>
+
+      <!-- ---- duo deck ---- -->
+      <section class="screen" id="sc-duo">
+        <div class="deck" id="deck">
+          <p class="deck-empty" id="deck-empty" data-i18n="deck_empty">โปรไฟล์วันนี้หมดแล้ว พรุ่งนี้ดวงใหม่มาอีกรอบ</p>
+        </div>
+        <div class="deckbtns">
+          <button class="big-round no" id="d-pass" aria-label="Pass">✕</button>
+          <button class="big-round yes" id="d-like" aria-label="Like">💓</button>
+        </div>
+        <p class="tiny center" data-i18n="deck_hint">ลากการ์ดซ้ายขวา หรือกดปุ่มก็ได้</p>
+        <div class="burst" id="burst">
+          <div class="hearts">💘</div>
+          <div class="t">It's a match!</div>
+          <p class="muted" id="burst-sub"></p>
+        </div>
+      </section>
+
+      <!-- ---- chat (shared by duo + gang) ---- -->
+      <section class="screen" id="sc-chat">
+        <div class="roombar">
+          <button class="facebtn" id="facebtn" hidden aria-haspopup="dialog">
+            <span class="fb-av" id="fb-av">🙂</span>
+            <span class="fb-i">i</span>
+          </button>
+          <div class="seats" id="seats"></div>
+          <div class="rmeta">
+            <b id="room-name">—</b>
+            <span id="room-sub">—</span>
+          </div>
+          <div class="clock" id="clock" hidden>0:24</div>
+        </div>
+        <div class="thread" id="thread"></div>
+        <form class="composer" id="composer">
+          <input class="inp" id="msg" autocomplete="off" data-i18n-ph="ph_msg" placeholder="พิมพ์อะไรสักอย่าง…">
+          <button class="send" type="submit" aria-label="Send">➤</button>
+        </form>
+        <div class="row">
+          <button class="btn ghost sm" id="leave" style="flex:1" data-i18n="leave">ออกจากห้อง → สุ่มใหม่</button>
+          <button class="btn primary sm" id="tovote" style="flex:1" data-i18n="tovote">ข้ามไปโหวตเลย</button>
+          <button class="btn ghost sm" id="duo-no" style="flex:1" data-i18n="duo_no">ไม่แมช</button>
+          <button class="btn primary sm" id="duo-yes" style="flex:1" data-i18n="duo_yes">ขอแมช 💓</button>
+        </div>
+
+        <!-- profile sheet: the face icon opens this, and you decide from here -->
+        <div class="sheet" id="sheet" hidden>
+          <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sh-name">
+            <button class="sheet-x" id="sheet-x" aria-label="Close">✕</button>
+            <div class="sheet-face" id="sh-face">🙂</div>
+            <div class="sheet-who"><b id="sh-name">—</b><span class="mono" id="sh-age"></span></div>
+            <div class="sheet-job" id="sh-job"></div>
+            <p class="sheet-bio" id="sh-bio"></p>
+            <div class="sheet-tags" id="sh-tags"></div>
+            <div class="sheet-actions">
+              <button class="btn ghost sm" id="sh-no" style="flex:1" data-i18n="duo_no">ไม่แมช</button>
+              <button class="btn primary sm" id="sh-yes" style="flex:1" data-i18n="duo_yes">ขอแมช 💓</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- confirm ---- -->
+      <section class="screen" id="sc-confirm">
+        <div class="center">
+          <h2 class="h-md" data-i18n="cf_h">ยืนยันแมชไหม</h2>
+          <p class="muted" id="cf-p"></p>
+        </div>
+        <div class="grow" style="display:flex;flex-direction:column;justify-content:center;gap:18px">
+          <div class="votes" id="votes"></div>
+          <p class="tiny center" id="cf-status" data-i18n="cf_wait">กดยืนยันแล้วรอผลจากอีกฝ่าย</p>
+        </div>
+        <div class="stack">
+          <button class="btn primary wide" id="cf-yes" data-i18n="cf_yes">ยืนยันแมช 💓</button>
+          <button class="btn ghost wide sm" id="cf-no" data-i18n="cf_no">ยังก่อน กลับไปคุยต่อ</button>
+        </div>
+      </section>
+
+      <!-- ---- matched ---- -->
+      <section class="screen" id="sc-win">
+        <div class="verdict win">
+          <div class="mark">💓✅</div>
+          <div class="en">Matched</div>
+          <p class="th" id="win-sub"></p>
+        </div>
+        <div class="grow scrolly stack">
+          <div class="ticket">
+            <div class="top">
+              <div class="hd">First Visit</div>
+              <div class="ttl">Lucky Suki</div>
+              <div class="kv"><span data-i18n="t_when">วันเวลา</span><b id="w-when">—</b></div>
+              <div class="kv"><span data-i18n="t_table">โต๊ะ</span><b id="w-table">—</b></div>
+              <div class="kv"><span data-i18n="t_who">มากันกี่คน</span><b id="w-who">—</b></div>
+            </div>
+            <div class="perf"></div>
+            <div class="bot">
+              <div class="code" id="w-code">—</div>
+              <div class="barcode"></div>
+              <div class="tiny" data-i18n="t_show">แสดงโค้ดนี้ที่หน้าร้านเพื่อรับโต๊ะ</div>
+            </div>
+          </div>
+          <div class="voucher">
+            <div class="amt">10%</div>
+            <div class="txt">
+              <b data-i18n="v_win">ส่วนลดครั้งถัดไป</b>
+              <span data-i18n="v_win_s">ใช้ได้หลังจบมื้อแรก ภายใน 60 วัน</span>
+              <span class="mono" id="w-vcode" style="color:var(--reward);font-weight:600;margin-top:2px">—</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn ghost wide sm" data-restart data-i18n="again">เล่นอีกครั้ง</button>
+      </section>
+
+      <!-- ---- no match ---- -->
+      <section class="screen" id="sc-lose">
+        <div class="verdict lose">
+          <div class="mark">❎</div>
+          <div class="en">No match</div>
+          <p class="th">your luck needs a little more time…</p>
+        </div>
+        <div class="grow scrolly stack">
+          <p class="center" style="font-family:Mitr,sans-serif;font-size:16px;line-height:1.5">Today, you’ve unlocked a<br><b style="color:var(--reward)">Lucky Dessert!</b> 🍮</p>
+          <div class="ticket" style="--notch:56%">
+            <div class="top">
+              <div class="hd">Lucky Dessert</div>
+              <div class="ttl" data-i18n="l_ttl">ของหวานประจำวันของคุณ</div>
+              <div class="kv"><span data-i18n="t_val">มูลค่า</span><b>฿100</b></div>
+              <div class="kv"><span data-i18n="t_use">ใช้ได้</span><b data-i18n="t_today">วันนี้ ที่ Lucky Suki</b></div>
+            </div>
+            <div class="perf"></div>
+            <div class="bot">
+              <div class="code" id="l-code">—</div>
+              <div class="barcode"></div>
+              <div class="tiny" data-i18n="t_show2">ยื่นโค้ดนี้ที่เคาน์เตอร์ของหวาน</div>
+            </div>
+          </div>
+          <div class="voucher">
+            <div class="amt">฿100</div>
+            <div class="txt">
+              <b data-i18n="v_lose">Lucky Dessert Voucher</b>
+              <span data-i18n="v_lose_s">ดวงยังไม่มา แต่ยังมีโต๊ะรอคุณอยู่</span>
+            </div>
+          </div>
+        </div>
+        <div class="stack">
+          <button class="btn primary wide" data-restart data-i18n="retry">ลองแมชใหม่อีกรอบ</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
