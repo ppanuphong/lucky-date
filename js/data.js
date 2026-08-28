@@ -1,7 +1,18 @@
 "use strict";
 
 /* ==================== data ==================== */
-const AVATARS = ["🦊","🐼","🐧","🐙","🦖","🐝","🦉","🐳","🍜","🌶️"];
+const AVATARS = [
+  {skin:"#F6D3B0", hair:"#2B1A12", style:"long",     bg:"#F6DCC8", shirt:"#C21F26"},
+  {skin:"#EFC098", hair:"#1C1C22", style:"short",    bg:"#EFD8C4", shirt:"#8C6106"},
+  {skin:"#E0A87C", hair:"#4A2B18", style:"bun",      bg:"#F3DBC6", shirt:"#7A2E2E"},
+  {skin:"#C98A5F", hair:"#2B1A12", style:"curly",    bg:"#EEDAC6", shirt:"#A8541C"},
+  {skin:"#F6D3B0", hair:"#7A4A24", style:"bob",      bg:"#F7E0CE", shirt:"#5B4A8C"},
+  {skin:"#A76E48", hair:"#1C1C22", style:"buzz",     bg:"#EBD6C2", shirt:"#1F6B57"},
+  {skin:"#EFC098", hair:"#8C5A2B", style:"ponytail", bg:"#F5DFCB", shirt:"#C21F26"},
+  {skin:"#E0A87C", hair:"#2B1A12", style:"beard",    bg:"#F1DAC5", shirt:"#2E4E8C"},
+  {skin:"#F6D3B0", hair:"#5B3A2A", style:"wavy",     bg:"#F7E2D2", shirt:"#B8477A"},
+  {skin:"#C98A5F", hair:"#4A2B18", style:"chef",     bg:"#EFDAC7", shirt:"#8C6106"}
+];
 
 const TAGS = [
   {id:"cafe",  th:"คาเฟ่ฮอปปิ้ง", en:"café hopping"},
@@ -36,34 +47,34 @@ const DATE_PREFS = [
 ];
 
 const PROFILES = [
-  {av:"🧋", age:24, g:"f", chance:.62,
+  {av:{skin:"#F6D3B0", hair:"#2B1A12", style:"long",     bg:"#F7DCC9", shirt:"#C21F26"}, age:24, g:"f", chance:.62,
    th:{n:"ใบเฟิร์น",job:"ครีเอทีฟเอเจนซี่",bio:"เลิกงานสามทุ่มแต่ยังไหวถ้าเป็นหม้อไฟ ขอจองหน้าที่ตักลูกชิ้นให้",tg:["คาเฟ่ฮอปปิ้ง","ดูหนังผี","ต้มยำเผ็ดสุด"]},
    en:{n:"Baifern",job:"creative agency",bio:"Off work at nine and still up for hot pot. I'm calling dibs on ladling the meatballs.",tg:["café hopping","horror films","extra-spicy tom yum"]}},
-  {av:"🎧", age:27, g:"m", chance:.55,
+  {av:{skin:"#EFC098", hair:"#1C1C22", style:"short",    bg:"#EAD6C2", shirt:"#2E4E8C"}, age:27, g:"m", chance:.55,
    th:{n:"ตะวัน",job:"โปรดิวเซอร์เพลง",bio:"มีเพลย์ลิสต์สำหรับทุกอารมณ์ รวมถึงอารมณ์รอน้ำซุปเดือด",tg:["อินดี้","วิ่งสวนลุม","ซุปกระดูกหมู"]},
    en:{n:"Tawan",job:"music producer",bio:"I have a playlist for every mood, including waiting-for-the-broth-to-boil.",tg:["indie","running","pork bone broth"]}},
-  {av:"🐈", age:23, g:"f", chance:.6,
+  {av:{skin:"#E0A87C", hair:"#4A2B18", style:"curly",    bg:"#F2DAC6", shirt:"#1F6B57"}, age:23, g:"f", chance:.6,
    th:{n:"มะปราง",job:"นักเรียนสัตวแพทย์",bio:"เลี้ยงแมวสามตัว กินผักมากกว่าเนื้อ แต่ไม่เคยพลาดเต้าหู้ไข่",tg:["ทาสแมว","ปลูกต้นไม้","น้ำใส"]},
    en:{n:"Maprang",job:"vet student",bio:"Three cats, more veggies than meat, but I never skip the egg tofu.",tg:["cat person","plants","clear broth"]}},
-  {av:"🏀", age:29, g:"m", chance:.5,
+  {av:{skin:"#C98A5F", hair:"#2B1A12", style:"beard",    bg:"#EAD5C0", shirt:"#8C6106"}, age:29, g:"m", chance:.5,
    th:{n:"กันต์",job:"วิศวกร",bio:"เถียงเรื่องจิ้มจุ่มกับสุกี้ได้ยาวสองชั่วโมง เตรียมตัวมาดีๆ",tg:["บาส","บอร์ดเกม","น้ำจิ้มสูตรลับ"]},
    en:{n:"Kan",job:"engineer",bio:"I can argue jim jum versus suki for two hours straight. Come prepared.",tg:["basketball","board games","secret dipping sauce"]}},
-  {av:"📷", age:26, g:"f", chance:.58,
+  {av:{skin:"#F6D3B0", hair:"#8C5A2B", style:"ponytail", bg:"#F7E1D0", shirt:"#B8477A"}, age:26, g:"f", chance:.58,
    th:{n:"ปูเป้",job:"ช่างภาพอิสระ",bio:"ถ่ายรูปอาหารก่อนกินทุกครั้ง ขอเวลา 15 วิ สัญญาว่าไม่นาน",tg:["ฟิล์ม","เชียงใหม่","หมูสไลด์"]},
    en:{n:"Poupée",job:"freelance photographer",bio:"I photograph every dish before eating. Fifteen seconds, I promise.",tg:["film cameras","Chiang Mai","sliced pork"]}},
-  {av:"👨‍🍳", age:25, g:"m", chance:.65,
+  {av:{skin:"#E0A87C", hair:"#2B1A12", style:"chef",     bg:"#F0DAC6", shirt:"#A8541C"}, age:25, g:"m", chance:.65,
    th:{n:"อาร์ม",job:"ผู้ช่วยเชฟ",bio:"ทำอาหารให้คนอื่นทั้งวัน วันหยุดเลยอยากให้ใครสักคนตักให้บ้าง",tg:["ทำขนม","วิ่งเทรล","มิโซะ"]},
    en:{n:"Arm",job:"line cook",bio:"I cook for people all day. On my day off I'd like someone to serve me for once.",tg:["baking","trail running","miso"]}},
-  {av:"🧘", age:28, g:"f", chance:.6,
+  {av:{skin:"#EFC098", hair:"#7A4A24", style:"wavy",     bg:"#F5DFCC", shirt:"#5B4A8C"}, age:28, g:"f", chance:.6,
    th:{n:"แพรว",job:"ครูสอนโยคะ",bio:"ตื่นตีห้าทุกวัน แต่ยอมอดนอนเพื่อหม้อไฟรอบดึกได้เสมอ",tg:["โยคะ","ตลาดนัด","เต้าหู้อ่อน"]},
    en:{n:"Praew",job:"yoga teacher",bio:"Up at five every day, but I'll always lose sleep for a late-night pot.",tg:["yoga","farmers markets","silken tofu"]}},
-  {av:"☕", age:26, g:"m", chance:.57,
+  {av:{skin:"#A76E48", hair:"#1C1C22", style:"buzz",     bg:"#E9D4C0", shirt:"#C21F26"}, age:26, g:"m", chance:.57,
    th:{n:"โต้ง",job:"บาริสต้า",bio:"จำสูตรกาแฟลูกค้าได้ทุกคน แต่จำชื่อตัวเองไม่ค่อยได้",tg:["กาแฟ","แผ่นเสียง","ซุปต้มยำ"]},
    en:{n:"Tong",job:"barista",bio:"I remember every regular's order but not always my own name.",tg:["coffee","vinyl","tom yum broth"]}},
-  {av:"🎨", age:25, g:"x", chance:.63,
+  {av:{skin:"#F6D3B0", hair:"#5B3A2A", style:"bob",      bg:"#F6E0CE", shirt:"#1F6B57"}, age:25, g:"x", chance:.63,
    th:{n:"มินท์",job:"กราฟิกดีไซเนอร์",bio:"เลือกสีนานกว่าเลือกเมนู ขอโทษล่วงหน้า",tg:["งานคราฟต์","สะสมสติกเกอร์","เห็ดหอม"]},
    en:{n:"Mint",job:"graphic designer",bio:"I take longer picking a colour than picking a dish. Apologising in advance.",tg:["craft fairs","stickers","shiitake"]}},
-  {av:"🌙", age:27, g:"x", chance:.6,
+  {av:{skin:"#C98A5F", hair:"#4A2B18", style:"bun",      bg:"#EFD9C5", shirt:"#8C6106"}, age:27, g:"x", chance:.6,
    th:{n:"เรน",job:"นักเขียนอิสระ",bio:"เขียนงานตอนตีสอง กินข้าวตอนตีสาม หาคนนอนดึกเหมือนกัน",tg:["หนังสือ","ร้านเหล้าเล็กๆ","วุ้นเส้น"]},
    en:{n:"Rain",job:"freelance writer",bio:"I write at 2am and eat at 3am. Looking for someone on the same schedule.",tg:["books","tiny bars","glass noodles"]}}
 ];
@@ -78,11 +89,11 @@ const DUO_SCRIPT = {
 };
 
 const GANG_PEOPLE = [
-  {av:"🦖", th:"โดโด้", en:"Dodo"}, {av:"🐝", th:"น้ำผึ้ง", en:"Peung"},
-  {av:"🐙", th:"ปลาหมึก", en:"Muek"}, {av:"🦉", th:"อุ๋ย", en:"Ou"},
-  {av:"🐼", th:"หมีพู", en:"Poo"}, {av:"🐧", th:"เพนกวิน", en:"Pen"},
-  {av:"🌶️", th:"พริก", en:"Prik"}, {av:"🍜", th:"เส้นใหญ่", en:"Yai"},
-  {av:"🦊", th:"ฟ็อกซ์", en:"Fox"}, {av:"🐳", th:"วาฬ", en:"Wan"}
+  {av:{skin:"#EFC098", hair:"#8C5A2B", style:"short",    bg:"#EFD9C5", shirt:"#C21F26"}, th:"โดโด้", en:"Dodo"}, {av:{skin:"#F6D3B0", hair:"#7A4A24", style:"long",     bg:"#F7E0CE", shirt:"#B8477A"}, th:"น้ำผึ้ง", en:"Peung"},
+  {av:{skin:"#C98A5F", hair:"#1C1C22", style:"curly",    bg:"#EBD6C1", shirt:"#1F6B57"}, th:"ปลาหมึก", en:"Muek"}, {av:{skin:"#E0A87C", hair:"#2B1A12", style:"bun",      bg:"#F1DAC6", shirt:"#8C6106"}, th:"อุ๋ย", en:"Ou"},
+  {av:{skin:"#A76E48", hair:"#2B1A12", style:"beard",    bg:"#E8D3BF", shirt:"#2E4E8C"}, th:"หมีพู", en:"Poo"}, {av:{skin:"#F6D3B0", hair:"#5B3A2A", style:"buzz",     bg:"#F6E1D0", shirt:"#A8541C"}, th:"เพนกวิน", en:"Pen"},
+  {av:{skin:"#EFC098", hair:"#4A2B18", style:"ponytail", bg:"#F2DCC8", shirt:"#5B4A8C"}, th:"พริก", en:"Prik"}, {av:{skin:"#C98A5F", hair:"#2B1A12", style:"bob",      bg:"#EEDAC6", shirt:"#C21F26"}, th:"เส้นใหญ่", en:"Yai"},
+  {av:{skin:"#F6D3B0", hair:"#1C1C22", style:"wavy",     bg:"#F7E2D2", shirt:"#1F6B57"}, th:"ฟ็อกซ์", en:"Fox"}, {av:{skin:"#E0A87C", hair:"#8C5A2B", style:"short",    bg:"#F0DBC7", shirt:"#8C6106"}, th:"วาฬ", en:"Wan"}
 ];
 
 const ROOMS = [

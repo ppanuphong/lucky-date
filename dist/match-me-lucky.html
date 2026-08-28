@@ -23,6 +23,7 @@
   --win:#C21F26;
   --win-soft:#FADFDA;
   --bubble-them:#FCF2DF;
+  --scrim:rgba(42,20,16,.52);
   --shadow-lg:0 22px 48px -26px rgba(120,60,10,.42);
   --shadow-sm:0 6px 18px -12px rgba(120,60,10,.5);
   --broth-a:216,180,90;
@@ -48,6 +49,7 @@
     --win:#F4635A;
     --win-soft:#4C1A14;
     --bubble-them:#3C2618;
+    --scrim:rgba(0,0,0,.62);
     --shadow-lg:0 24px 52px -22px rgba(0,0,0,.85);
     --shadow-sm:0 6px 20px -12px rgba(0,0,0,.9);
     --broth-a:233,192,90;
@@ -73,6 +75,7 @@
   --win:#F4635A;
   --win-soft:#4C1A14;
   --bubble-them:#3C2618;
+  --scrim:rgba(0,0,0,.62);
   --shadow-lg:0 24px 52px -22px rgba(0,0,0,.85);
   --shadow-sm:0 6px 20px -12px rgba(0,0,0,.9);
   --broth-a:233,192,90;
@@ -198,7 +201,7 @@ input,textarea{font:inherit}
 .langbtn:hover{background:var(--chili-soft)}
 
 .stage{flex:1;min-height:0;position:relative}
-.screen{display:none;flex-direction:column;gap:15px;height:100%;padding:20px 18px 22px}
+.screen{display:none;flex-direction:column;gap:15px;padding:20px 18px 22px;position:absolute;inset:0}
 .screen.on{display:flex;animation:rise .36s cubic-bezier(.2,.8,.3,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
@@ -279,7 +282,7 @@ input,textarea{font:inherit}
 .av[aria-pressed="true"]{border-color:var(--chili);background:var(--chili-soft);transform:scale(1.08)}
 
 /* ============ duo deck ============ */
-.deck{position:relative;flex:1;min-height:0}
+.deck{position:relative;flex:1 1 auto;min-height:300px}
 .card{
   position:absolute;inset:0;
   display:flex;flex-direction:column;
@@ -289,12 +292,12 @@ input,textarea{font:inherit}
   will-change:transform;
 }
 .card .face{
-  flex:none;height:42%;min-height:130px;display:grid;place-items:center;
+  flex:1 1 auto;min-height:168px;padding:18px 0;display:grid;place-items:center;
   font-size:62px;
   background:radial-gradient(120% 100% at 50% 0%,var(--chili-soft),var(--surface-3));
   border-bottom:1px solid var(--line);
 }
-.card .meat{padding:14px 16px 16px;display:flex;flex-direction:column;gap:7px;overflow-y:auto}
+.card .meat{flex:none;padding:14px 16px 16px;display:flex;flex-direction:column;gap:7px;overflow-y:auto}
 .card .who{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .card .who b{font-family:"Mitr",sans-serif;font-weight:600;font-size:20px}
 .card .who span{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2)}
@@ -493,11 +496,8 @@ input,textarea{font:inherit}
 .sheet{
   position:absolute;inset:0;z-index:8;
   display:flex;align-items:center;justify-content:center;padding:22px 18px;
-  background:color-mix(in srgb,var(--ink) 46%,transparent);
+  background:var(--scrim);
   animation:fade .2s ease both;
-}
-@supports not (background:color-mix(in srgb,red 50%,transparent)){
-  .sheet{background:rgba(0,0,0,.5)}
 }
 @keyframes fade{from{opacity:0}to{opacity:1}}
 .sheet-card{
@@ -541,8 +541,8 @@ input,textarea{font:inherit}
 
 /* ============ swipe card: avatar as a real icon ============ */
 .card .face-ring{
-  width:104px;height:104px;border-radius:50%;
-  display:grid;place-items:center;font-size:52px;line-height:1;
+  width:clamp(120px,52%,196px);aspect-ratio:1;height:auto;border-radius:50%;
+  display:grid;place-items:center;font-size:60px;line-height:1;
   background:var(--surface);
   border:2.5px solid var(--chili);
   box-shadow:var(--shadow-sm);
@@ -553,6 +553,15 @@ input,textarea{font:inherit}
   background:var(--chili-soft);color:var(--chili-strong);
   white-space:nowrap;
 }
+
+/* ============ cartoon avatars (inline SVG) ============ */
+.av, .seat, .msg .ava, .vote .face,
+.card .face-ring, .sheet-face, .fb-av{ overflow:hidden; padding:0 }
+.av > svg, .seat > svg, .msg .ava > svg, .vote .face > svg,
+.card .face-ring > svg, .sheet-face > svg, .fb-av > svg{
+  display:block;width:100%;height:100%;border-radius:50%;
+}
+.fb-av{ width:38px;height:38px;border-radius:50%;flex:none }
 </style>
 
 <canvas id="broth" aria-hidden="true"></canvas>
@@ -970,11 +979,87 @@ function applyLang(){
   if (!document.getElementById("sheet").hidden) openSheet();
 }
 
+/* ---------- js/avatar.js ---------- */
+"use strict";
+
+/* ==================== cartoon avatars ====================
+   Drawn as inline SVG rather than emoji: emoji are font glyphs, so they
+   change shape per device and ZWJ sequences (👩‍🦱) fall apart or vanish
+   where the font lacks them. These render identically everywhere. */
+
+const SKINS = ["#F6D3B0","#EFC098","#E0A87C","#C98A5F","#A76E48"];
+const HAIRS = ["#2B1A12","#4A2B18","#7A4A24","#1C1C22","#8C5A2B","#5B3A2A"];
+
+function hairPath(style, hair){
+  const cap = '<path d="M28 44c0-15 9-24 22-24s22 9 22 24c0-9-7-13-22-13S28 35 28 44z" fill="'+hair+'"/>';
+  switch(style){
+    case "long":
+      return '<path d="M26 42c0-16 10-24 24-24s24 8 24 24v34c0 3-4 4-6 1V48H32v29c0 3-6 2-6-1z" fill="'+hair+'"/>' + cap;
+    case "bob":
+      return '<path d="M26 44c0-16 10-24 24-24s24 8 24 24v16c0 3-5 3-6 0V48H32v12c0 3-6 3-6 0z" fill="'+hair+'"/>' + cap;
+    case "wavy":
+      return '<path d="M26 42c0-16 10-24 24-24s24 8 24 24v28q0 6-4 8-3-4 0-8V48H32v22q3 4 0 8-4-2-4-8z" fill="'+hair+'"/>' + cap;
+    case "curly":
+      return '<g fill="'+hair+'"><circle cx="34" cy="34" r="9"/><circle cx="46" cy="28" r="10"/>'
+           + '<circle cx="58" cy="29" r="9"/><circle cx="67" cy="36" r="8"/></g>' + cap;
+    case "bun":
+      return '<circle cx="50" cy="15" r="8" fill="'+hair+'"/>' + cap;
+    case "ponytail":
+      return cap + '<path d="M71 36q10 4 9 16t-8 14q5-9 2-16t-6-10z" fill="'+hair+'"/>';
+    case "buzz":
+      return '<path d="M30 43c0-13 8-21 20-21s20 8 20 21c0-7-7-10-20-10s-20 3-20 10z" fill="'+hair+'"/>';
+    case "beard":
+      return cap + '<path d="M29 45q1 26 21 26t21-26q2 16-4 25-6 8-17 8t-17-8q-6-9-4-25z" fill="'+hair+'" opacity=".92"/>';
+    case "chef":
+      return cap + '<path d="M32 22q-7-1-7-7t7-6q1-6 8-6t10 4q3-4 10-4t8 6q7 0 7 6t-7 7z" fill="#FFF8EE"/>'
+                 + '<rect x="31" y="20" width="38" height="6" rx="3" fill="#F1E3D0"/>';
+    default: // "short"
+      return cap;
+  }
+}
+
+// one cartoon portrait; square, meant to sit inside a round container
+function avatarSVG(a){
+  if (!a) a = AVATARS[0];
+  const skin = a.skin, hair = a.hair;
+  return '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
+    + '<rect width="100" height="100" fill="' + a.bg + '"/>'
+    + '<path d="M10 100c0-20 18-30 40-30s40 10 40 30z" fill="' + a.shirt + '"/>'
+    + '<path d="M43 58h14v15a7 7 0 0 1-14 0z" fill="' + skin + '" opacity=".82"/>'
+    + '<circle cx="28" cy="48" r="4.6" fill="' + skin + '"/><circle cx="72" cy="48" r="4.6" fill="' + skin + '"/>'
+    + '<path d="M50 21c-13 0-21 9-21 22s9 25 21 25 21-12 21-25-8-22-21-22z" fill="' + skin + '"/>'
+    + hairPath(a.style, hair)
+    + '<ellipse cx="41.5" cy="46" rx="2.4" ry="3" fill="#3B2A22"/>'
+    + '<ellipse cx="58.5" cy="46" rx="2.4" ry="3" fill="#3B2A22"/>'
+    + '<circle cx="42.4" cy="45" r=".9" fill="#FFF" opacity=".9"/>'
+    + '<circle cx="59.4" cy="45" r=".9" fill="#FFF" opacity=".9"/>'
+    + '<path d="M37.5 39.5q4-2.5 8-.6" stroke="' + hair + '" stroke-width="1.7" fill="none" stroke-linecap="round"/>'
+    + '<path d="M54.5 38.9q4-1.9 8 .6" stroke="' + hair + '" stroke-width="1.7" fill="none" stroke-linecap="round"/>'
+    + '<ellipse cx="35.5" cy="53" rx="4" ry="2.3" fill="#E2726E" opacity=".4"/>'
+    + '<ellipse cx="64.5" cy="53" rx="4" ry="2.3" fill="#E2726E" opacity=".4"/>'
+    + '<path d="M45 55.5q5 4.6 10 0" stroke="#8E4436" stroke-width="1.9" fill="none" stroke-linecap="round"/>'
+    + '</svg>';
+}
+
+// paint a cartoon into any round container
+function setAvatar(el, spec){ if (el) el.innerHTML = avatarSVG(spec); }
+
 /* ---------- js/data.js ---------- */
 "use strict";
 
 /* ==================== data ==================== */
-const AVATARS = ["🦊","🐼","🐧","🐙","🦖","🐝","🦉","🐳","🍜","🌶️"];
+const AVATARS = [
+  {skin:"#F6D3B0", hair:"#2B1A12", style:"long",     bg:"#F6DCC8", shirt:"#C21F26"},
+  {skin:"#EFC098", hair:"#1C1C22", style:"short",    bg:"#EFD8C4", shirt:"#8C6106"},
+  {skin:"#E0A87C", hair:"#4A2B18", style:"bun",      bg:"#F3DBC6", shirt:"#7A2E2E"},
+  {skin:"#C98A5F", hair:"#2B1A12", style:"curly",    bg:"#EEDAC6", shirt:"#A8541C"},
+  {skin:"#F6D3B0", hair:"#7A4A24", style:"bob",      bg:"#F7E0CE", shirt:"#5B4A8C"},
+  {skin:"#A76E48", hair:"#1C1C22", style:"buzz",     bg:"#EBD6C2", shirt:"#1F6B57"},
+  {skin:"#EFC098", hair:"#8C5A2B", style:"ponytail", bg:"#F5DFCB", shirt:"#C21F26"},
+  {skin:"#E0A87C", hair:"#2B1A12", style:"beard",    bg:"#F1DAC5", shirt:"#2E4E8C"},
+  {skin:"#F6D3B0", hair:"#5B3A2A", style:"wavy",     bg:"#F7E2D2", shirt:"#B8477A"},
+  {skin:"#C98A5F", hair:"#4A2B18", style:"chef",     bg:"#EFDAC7", shirt:"#8C6106"}
+];
 
 const TAGS = [
   {id:"cafe",  th:"คาเฟ่ฮอปปิ้ง", en:"café hopping"},
@@ -1009,34 +1094,34 @@ const DATE_PREFS = [
 ];
 
 const PROFILES = [
-  {av:"🧋", age:24, g:"f", chance:.62,
+  {av:{skin:"#F6D3B0", hair:"#2B1A12", style:"long",     bg:"#F7DCC9", shirt:"#C21F26"}, age:24, g:"f", chance:.62,
    th:{n:"ใบเฟิร์น",job:"ครีเอทีฟเอเจนซี่",bio:"เลิกงานสามทุ่มแต่ยังไหวถ้าเป็นหม้อไฟ ขอจองหน้าที่ตักลูกชิ้นให้",tg:["คาเฟ่ฮอปปิ้ง","ดูหนังผี","ต้มยำเผ็ดสุด"]},
    en:{n:"Baifern",job:"creative agency",bio:"Off work at nine and still up for hot pot. I'm calling dibs on ladling the meatballs.",tg:["café hopping","horror films","extra-spicy tom yum"]}},
-  {av:"🎧", age:27, g:"m", chance:.55,
+  {av:{skin:"#EFC098", hair:"#1C1C22", style:"short",    bg:"#EAD6C2", shirt:"#2E4E8C"}, age:27, g:"m", chance:.55,
    th:{n:"ตะวัน",job:"โปรดิวเซอร์เพลง",bio:"มีเพลย์ลิสต์สำหรับทุกอารมณ์ รวมถึงอารมณ์รอน้ำซุปเดือด",tg:["อินดี้","วิ่งสวนลุม","ซุปกระดูกหมู"]},
    en:{n:"Tawan",job:"music producer",bio:"I have a playlist for every mood, including waiting-for-the-broth-to-boil.",tg:["indie","running","pork bone broth"]}},
-  {av:"🐈", age:23, g:"f", chance:.6,
+  {av:{skin:"#E0A87C", hair:"#4A2B18", style:"curly",    bg:"#F2DAC6", shirt:"#1F6B57"}, age:23, g:"f", chance:.6,
    th:{n:"มะปราง",job:"นักเรียนสัตวแพทย์",bio:"เลี้ยงแมวสามตัว กินผักมากกว่าเนื้อ แต่ไม่เคยพลาดเต้าหู้ไข่",tg:["ทาสแมว","ปลูกต้นไม้","น้ำใส"]},
    en:{n:"Maprang",job:"vet student",bio:"Three cats, more veggies than meat, but I never skip the egg tofu.",tg:["cat person","plants","clear broth"]}},
-  {av:"🏀", age:29, g:"m", chance:.5,
+  {av:{skin:"#C98A5F", hair:"#2B1A12", style:"beard",    bg:"#EAD5C0", shirt:"#8C6106"}, age:29, g:"m", chance:.5,
    th:{n:"กันต์",job:"วิศวกร",bio:"เถียงเรื่องจิ้มจุ่มกับสุกี้ได้ยาวสองชั่วโมง เตรียมตัวมาดีๆ",tg:["บาส","บอร์ดเกม","น้ำจิ้มสูตรลับ"]},
    en:{n:"Kan",job:"engineer",bio:"I can argue jim jum versus suki for two hours straight. Come prepared.",tg:["basketball","board games","secret dipping sauce"]}},
-  {av:"📷", age:26, g:"f", chance:.58,
+  {av:{skin:"#F6D3B0", hair:"#8C5A2B", style:"ponytail", bg:"#F7E1D0", shirt:"#B8477A"}, age:26, g:"f", chance:.58,
    th:{n:"ปูเป้",job:"ช่างภาพอิสระ",bio:"ถ่ายรูปอาหารก่อนกินทุกครั้ง ขอเวลา 15 วิ สัญญาว่าไม่นาน",tg:["ฟิล์ม","เชียงใหม่","หมูสไลด์"]},
    en:{n:"Poupée",job:"freelance photographer",bio:"I photograph every dish before eating. Fifteen seconds, I promise.",tg:["film cameras","Chiang Mai","sliced pork"]}},
-  {av:"👨‍🍳", age:25, g:"m", chance:.65,
+  {av:{skin:"#E0A87C", hair:"#2B1A12", style:"chef",     bg:"#F0DAC6", shirt:"#A8541C"}, age:25, g:"m", chance:.65,
    th:{n:"อาร์ม",job:"ผู้ช่วยเชฟ",bio:"ทำอาหารให้คนอื่นทั้งวัน วันหยุดเลยอยากให้ใครสักคนตักให้บ้าง",tg:["ทำขนม","วิ่งเทรล","มิโซะ"]},
    en:{n:"Arm",job:"line cook",bio:"I cook for people all day. On my day off I'd like someone to serve me for once.",tg:["baking","trail running","miso"]}},
-  {av:"🧘", age:28, g:"f", chance:.6,
+  {av:{skin:"#EFC098", hair:"#7A4A24", style:"wavy",     bg:"#F5DFCC", shirt:"#5B4A8C"}, age:28, g:"f", chance:.6,
    th:{n:"แพรว",job:"ครูสอนโยคะ",bio:"ตื่นตีห้าทุกวัน แต่ยอมอดนอนเพื่อหม้อไฟรอบดึกได้เสมอ",tg:["โยคะ","ตลาดนัด","เต้าหู้อ่อน"]},
    en:{n:"Praew",job:"yoga teacher",bio:"Up at five every day, but I'll always lose sleep for a late-night pot.",tg:["yoga","farmers markets","silken tofu"]}},
-  {av:"☕", age:26, g:"m", chance:.57,
+  {av:{skin:"#A76E48", hair:"#1C1C22", style:"buzz",     bg:"#E9D4C0", shirt:"#C21F26"}, age:26, g:"m", chance:.57,
    th:{n:"โต้ง",job:"บาริสต้า",bio:"จำสูตรกาแฟลูกค้าได้ทุกคน แต่จำชื่อตัวเองไม่ค่อยได้",tg:["กาแฟ","แผ่นเสียง","ซุปต้มยำ"]},
    en:{n:"Tong",job:"barista",bio:"I remember every regular's order but not always my own name.",tg:["coffee","vinyl","tom yum broth"]}},
-  {av:"🎨", age:25, g:"x", chance:.63,
+  {av:{skin:"#F6D3B0", hair:"#5B3A2A", style:"bob",      bg:"#F6E0CE", shirt:"#1F6B57"}, age:25, g:"x", chance:.63,
    th:{n:"มินท์",job:"กราฟิกดีไซเนอร์",bio:"เลือกสีนานกว่าเลือกเมนู ขอโทษล่วงหน้า",tg:["งานคราฟต์","สะสมสติกเกอร์","เห็ดหอม"]},
    en:{n:"Mint",job:"graphic designer",bio:"I take longer picking a colour than picking a dish. Apologising in advance.",tg:["craft fairs","stickers","shiitake"]}},
-  {av:"🌙", age:27, g:"x", chance:.6,
+  {av:{skin:"#C98A5F", hair:"#4A2B18", style:"bun",      bg:"#EFD9C5", shirt:"#8C6106"}, age:27, g:"x", chance:.6,
    th:{n:"เรน",job:"นักเขียนอิสระ",bio:"เขียนงานตอนตีสอง กินข้าวตอนตีสาม หาคนนอนดึกเหมือนกัน",tg:["หนังสือ","ร้านเหล้าเล็กๆ","วุ้นเส้น"]},
    en:{n:"Rain",job:"freelance writer",bio:"I write at 2am and eat at 3am. Looking for someone on the same schedule.",tg:["books","tiny bars","glass noodles"]}}
 ];
@@ -1051,11 +1136,11 @@ const DUO_SCRIPT = {
 };
 
 const GANG_PEOPLE = [
-  {av:"🦖", th:"โดโด้", en:"Dodo"}, {av:"🐝", th:"น้ำผึ้ง", en:"Peung"},
-  {av:"🐙", th:"ปลาหมึก", en:"Muek"}, {av:"🦉", th:"อุ๋ย", en:"Ou"},
-  {av:"🐼", th:"หมีพู", en:"Poo"}, {av:"🐧", th:"เพนกวิน", en:"Pen"},
-  {av:"🌶️", th:"พริก", en:"Prik"}, {av:"🍜", th:"เส้นใหญ่", en:"Yai"},
-  {av:"🦊", th:"ฟ็อกซ์", en:"Fox"}, {av:"🐳", th:"วาฬ", en:"Wan"}
+  {av:{skin:"#EFC098", hair:"#8C5A2B", style:"short",    bg:"#EFD9C5", shirt:"#C21F26"}, th:"โดโด้", en:"Dodo"}, {av:{skin:"#F6D3B0", hair:"#7A4A24", style:"long",     bg:"#F7E0CE", shirt:"#B8477A"}, th:"น้ำผึ้ง", en:"Peung"},
+  {av:{skin:"#C98A5F", hair:"#1C1C22", style:"curly",    bg:"#EBD6C1", shirt:"#1F6B57"}, th:"ปลาหมึก", en:"Muek"}, {av:{skin:"#E0A87C", hair:"#2B1A12", style:"bun",      bg:"#F1DAC6", shirt:"#8C6106"}, th:"อุ๋ย", en:"Ou"},
+  {av:{skin:"#A76E48", hair:"#2B1A12", style:"beard",    bg:"#E8D3BF", shirt:"#2E4E8C"}, th:"หมีพู", en:"Poo"}, {av:{skin:"#F6D3B0", hair:"#5B3A2A", style:"buzz",     bg:"#F6E1D0", shirt:"#A8541C"}, th:"เพนกวิน", en:"Pen"},
+  {av:{skin:"#EFC098", hair:"#4A2B18", style:"ponytail", bg:"#F2DCC8", shirt:"#5B4A8C"}, th:"พริก", en:"Prik"}, {av:{skin:"#C98A5F", hair:"#2B1A12", style:"bob",      bg:"#EEDAC6", shirt:"#C21F26"}, th:"เส้นใหญ่", en:"Yai"},
+  {av:{skin:"#F6D3B0", hair:"#1C1C22", style:"wavy",     bg:"#F7E2D2", shirt:"#1F6B57"}, th:"ฟ็อกซ์", en:"Fox"}, {av:{skin:"#E0A87C", hair:"#8C5A2B", style:"short",    bg:"#F0DBC7", shirt:"#8C6106"}, th:"วาฬ", en:"Wan"}
 ];
 
 const ROOMS = [
@@ -1152,7 +1237,8 @@ function renderAvatars(){
   wrap.innerHTML = "";
   AVATARS.forEach(a => {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "av"; b.textContent = a;
+    b.type = "button"; b.className = "av";
+    setAvatar(b, a);
     b.setAttribute("aria-pressed", String(a === S.me.av));
     b.addEventListener("click", () => {
       S.me.av = a;
@@ -1218,7 +1304,7 @@ function loadMe(){
     const m = JSON.parse(raw);
     if (m && typeof m === "object") {
       S.me.name = m.name || ""; S.me.age = m.age || "";
-      S.me.av = AVATARS.includes(m.av) ? m.av : AVATARS[0];
+      S.me.av = AVATARS[Number(m.avi)] || AVATARS[0];
       S.me.bio = m.bio || "";
       S.me.tags = Array.isArray(m.tags) ? m.tags.filter(t => TAGS.some(x => x.id === t)) : [];
       S.me.broth = BROTHS.some(b => b.id === m.broth) ? m.broth : "tomyum";
@@ -1237,7 +1323,8 @@ $("bio-go").addEventListener("click", () => {
   S.me.name = name;
   S.me.age = $("f-age").value.trim();
   S.me.bio = $("f-bio").value.trim();
-  store.set("mml.me", JSON.stringify(S.me));
+  store.set("mml.me", JSON.stringify(
+    Object.assign({}, S.me, { av: undefined, avi: AVATARS.indexOf(S.me.av) })));
   if (S.group === "duo") startDuo(); else startGang();
 });
 
@@ -1269,7 +1356,7 @@ function renderDeck(){
         '<div class="tg">' + L.tg.map(() => "<em></em>").join("") + '</div>' +
       '</div>' +
       '<div class="stamp like">LIKE</div><div class="stamp pass">PASS</div>';
-    el.querySelector(".face-ring").textContent = p.av;
+    setAvatar(el.querySelector(".face-ring"), p.av);
     el.querySelector(".job").textContent = L.job;
     el.querySelector(".who b").textContent = L.n;
     el.querySelector(".who span").textContent = p.age;
@@ -1355,7 +1442,7 @@ function refreshLeaveBtn(){
   $("clock").hidden   = duo;
   $("facebtn").hidden = !duo;
   $("seats").hidden   = duo;   // the face icon already is the other person
-  if (duo && S.partner) $("fb-av").textContent = S.partner.av;
+  if (duo && S.partner) setAvatar($("fb-av"), S.partner.av);
 }
 
 /* The face icon opens the full profile of whoever you are talking to, so the
@@ -1364,7 +1451,7 @@ function openSheet(){
   const p = S.partner;
   if (!p) return;
   const L = p[lang];
-  $("sh-face").textContent = p.av;
+  setAvatar($("sh-face"), p.av);
   $("sh-name").textContent = L.n;
   $("sh-age").textContent  = p.age;
   const gd = GENDERS.find(g => g.id === p.g) || GENDERS[0];
@@ -1405,7 +1492,7 @@ function renderSeats(){
   S.members.forEach(m => {
     const d = document.createElement("div");
     d.className = "seat" + (m.me ? " me" : "");
-    d.textContent = m.av;
+    setAvatar(d, m.av);
     d.title = m.name;
     wrap.appendChild(d);
   });
@@ -1420,7 +1507,7 @@ function bubble(who, text, cls){
     el.querySelector(".bub").textContent = text;
   } else {
     el.innerHTML = '<div class="ava"></div><div class="body"><div class="nm"></div><div class="bub"></div></div>';
-    el.querySelector(".ava").textContent = who.av;
+    setAvatar(el.querySelector(".ava"), who.av);
     el.querySelector(".nm").textContent = who.name;
     el.querySelector(".bub").textContent = text;
   }
@@ -1434,7 +1521,7 @@ function typingThen(who, text, delay){
   const t = document.createElement("div");
   t.className = "msg typing";
   t.innerHTML = '<div class="ava"></div><div class="body"><div class="bub"><i></i><i></i><i></i></div></div>';
-  t.querySelector(".ava").textContent = who.av;
+  setAvatar(t.querySelector(".ava"), who.av);
   thread.appendChild(t);
   thread.scrollTop = thread.scrollHeight;
   later(() => { t.remove(); bubble(who, text); }, delay);
@@ -1590,7 +1677,7 @@ function renderVotes(){
     const d = document.createElement("div");
     d.className = "vote";
     d.innerHTML = '<div class="face"></div><div class="nm"></div><div class="st"></div>';
-    d.querySelector(".face").textContent = m.av;
+    setAvatar(d.querySelector(".face"), m.av);
     d.querySelector(".nm").textContent = m.name;
     wrap.appendChild(d);
     m.el = d;
@@ -1759,8 +1846,8 @@ document.querySelectorAll("[data-restart]").forEach(b => {
 })();
 
 /* ==================== boot ==================== */
+loadMe();          // restore first, so the picker renders with your saved pick
 renderAvatars();
-loadMe();
 applyLang();
 updateLuck();
 go("home");

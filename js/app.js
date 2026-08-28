@@ -64,7 +64,8 @@ function renderAvatars(){
   wrap.innerHTML = "";
   AVATARS.forEach(a => {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "av"; b.textContent = a;
+    b.type = "button"; b.className = "av";
+    setAvatar(b, a);
     b.setAttribute("aria-pressed", String(a === S.me.av));
     b.addEventListener("click", () => {
       S.me.av = a;
@@ -130,7 +131,7 @@ function loadMe(){
     const m = JSON.parse(raw);
     if (m && typeof m === "object") {
       S.me.name = m.name || ""; S.me.age = m.age || "";
-      S.me.av = AVATARS.includes(m.av) ? m.av : AVATARS[0];
+      S.me.av = AVATARS[Number(m.avi)] || AVATARS[0];
       S.me.bio = m.bio || "";
       S.me.tags = Array.isArray(m.tags) ? m.tags.filter(t => TAGS.some(x => x.id === t)) : [];
       S.me.broth = BROTHS.some(b => b.id === m.broth) ? m.broth : "tomyum";
@@ -149,7 +150,8 @@ $("bio-go").addEventListener("click", () => {
   S.me.name = name;
   S.me.age = $("f-age").value.trim();
   S.me.bio = $("f-bio").value.trim();
-  store.set("mml.me", JSON.stringify(S.me));
+  store.set("mml.me", JSON.stringify(
+    Object.assign({}, S.me, { av: undefined, avi: AVATARS.indexOf(S.me.av) })));
   if (S.group === "duo") startDuo(); else startGang();
 });
 
@@ -181,7 +183,7 @@ function renderDeck(){
         '<div class="tg">' + L.tg.map(() => "<em></em>").join("") + '</div>' +
       '</div>' +
       '<div class="stamp like">LIKE</div><div class="stamp pass">PASS</div>';
-    el.querySelector(".face-ring").textContent = p.av;
+    setAvatar(el.querySelector(".face-ring"), p.av);
     el.querySelector(".job").textContent = L.job;
     el.querySelector(".who b").textContent = L.n;
     el.querySelector(".who span").textContent = p.age;
@@ -267,7 +269,7 @@ function refreshLeaveBtn(){
   $("clock").hidden   = duo;
   $("facebtn").hidden = !duo;
   $("seats").hidden   = duo;   // the face icon already is the other person
-  if (duo && S.partner) $("fb-av").textContent = S.partner.av;
+  if (duo && S.partner) setAvatar($("fb-av"), S.partner.av);
 }
 
 /* The face icon opens the full profile of whoever you are talking to, so the
@@ -276,7 +278,7 @@ function openSheet(){
   const p = S.partner;
   if (!p) return;
   const L = p[lang];
-  $("sh-face").textContent = p.av;
+  setAvatar($("sh-face"), p.av);
   $("sh-name").textContent = L.n;
   $("sh-age").textContent  = p.age;
   const gd = GENDERS.find(g => g.id === p.g) || GENDERS[0];
@@ -317,7 +319,7 @@ function renderSeats(){
   S.members.forEach(m => {
     const d = document.createElement("div");
     d.className = "seat" + (m.me ? " me" : "");
-    d.textContent = m.av;
+    setAvatar(d, m.av);
     d.title = m.name;
     wrap.appendChild(d);
   });
@@ -332,7 +334,7 @@ function bubble(who, text, cls){
     el.querySelector(".bub").textContent = text;
   } else {
     el.innerHTML = '<div class="ava"></div><div class="body"><div class="nm"></div><div class="bub"></div></div>';
-    el.querySelector(".ava").textContent = who.av;
+    setAvatar(el.querySelector(".ava"), who.av);
     el.querySelector(".nm").textContent = who.name;
     el.querySelector(".bub").textContent = text;
   }
@@ -346,7 +348,7 @@ function typingThen(who, text, delay){
   const t = document.createElement("div");
   t.className = "msg typing";
   t.innerHTML = '<div class="ava"></div><div class="body"><div class="bub"><i></i><i></i><i></i></div></div>';
-  t.querySelector(".ava").textContent = who.av;
+  setAvatar(t.querySelector(".ava"), who.av);
   thread.appendChild(t);
   thread.scrollTop = thread.scrollHeight;
   later(() => { t.remove(); bubble(who, text); }, delay);
@@ -502,7 +504,7 @@ function renderVotes(){
     const d = document.createElement("div");
     d.className = "vote";
     d.innerHTML = '<div class="face"></div><div class="nm"></div><div class="st"></div>';
-    d.querySelector(".face").textContent = m.av;
+    setAvatar(d.querySelector(".face"), m.av);
     d.querySelector(".nm").textContent = m.name;
     wrap.appendChild(d);
     m.el = d;
@@ -671,8 +673,8 @@ document.querySelectorAll("[data-restart]").forEach(b => {
 })();
 
 /* ==================== boot ==================== */
+loadMe();          // restore first, so the picker renders with your saved pick
 renderAvatars();
-loadMe();
 applyLang();
 updateLuck();
 go("home");
