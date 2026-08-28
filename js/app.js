@@ -582,10 +582,10 @@ function finish(won){
     won: won,
     group: S.group,
     partner: S.members[1] ? S.members[1].name : "",
-    code: won ? code("FIRST") : code("DESSERT100"),
-    vcode: won ? code("LUCKY10") : ""
+    code: won ? code("FIRST") : code("DESSERT10"),
+    vcode: won ? code("LUCKY50") : ""
   };
-  store.set("mml.voucher", won ? "LUCKY10" : "DESSERT100");
+  store.set("mml.voucher", won ? "LUCKY50" : "DESSERT10");
   renderResult();
   go(won ? "win" : "lose");
 }

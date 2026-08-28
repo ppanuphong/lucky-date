@@ -47,8 +47,8 @@ node build.mjs        # → dist/match-me-lucky.html
 
 | เสียงโหวต | ผล |
 |---|---|
-| 3–4 | แมช ✅ → First Visit + voucher 10% |
+| 3–4 | แมช ✅ → First Visit + voucher ลด ฿50 |
 | 2   | ไม่สำเร็จ → เข้าห้องใหม่ทันที (ดวง +3%) |
-| 1   | No match ❎ → Lucky Dessert ฿100 |
+| 1   | No match ❎ → Lucky Dessert ลด 10% |
 
 ทุกครั้งที่สุ่มห้องใหม่ โอกาสแมชเพิ่ม 3% (เพดาน 18%)
